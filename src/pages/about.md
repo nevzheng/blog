@@ -36,6 +36,7 @@ I'm into photography, music, food, and travel. You can find some of that on my [
 
 ## Get In Touch
 
+📄 [Resume](/resume.pdf)
 📫 [nevzheng@gmail.com](mailto:nevzheng@gmail.com)
 🔗 [LinkedIn](https://www.linkedin.com/in/nevinzheng/)
 📷 [Instagram](https://www.instagram.com/nevzheng/)
