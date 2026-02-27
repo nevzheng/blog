@@ -5,6 +5,7 @@ import IconSearch from "@/assets/icons/IconSearch.svg";
 import IconArchive from "@/assets/icons/IconArchive.svg";
 import IconSunHigh from "@/assets/icons/IconSunHigh.svg";
 import IconMenuDeep from "@/assets/icons/IconMenuDeep.svg";
+import IconCoffee from "@/assets/icons/IconCoffee.svg";
 import LinkButton from "./LinkButton.astro";
 import { SITE } from "@/config";
 
@@ -119,6 +120,19 @@ const isActive = (path: string) => {
           >
             <IconSearch />
             <span class="sr-only">Search</span>
+          </LinkButton>
+        </li>
+        <li class="col-span-1 flex items-center justify-center">
+          <LinkButton
+            href="https://ko-fi.com/nevzheng"
+            class="focus-outline flex p-3 sm:p-1"
+            title="Buy me a coffee"
+            aria-label="buy me a coffee"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <IconCoffee />
+            <span class="sr-only">Buy me a coffee</span>
           </LinkButton>
         </li>
         {
