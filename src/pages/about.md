@@ -30,7 +30,12 @@ Building database and storage engine projects from scratch to explore the design
 
 I'm looking for my next role — ideally at a smaller company working on hard, unsolved problems in data infrastructure. I want to build things that matter with people who are passionate about the work. If that sounds like your team, I'd love to chat.
 
+## Outside of Work
+
+I'm into photography, music, food, and travel. You can find some of that on my [Instagram](https://www.instagram.com/nevzheng/).
+
 ## Get In Touch
 
 📫 [nevzheng@gmail.com](mailto:nevzheng@gmail.com)
 🔗 [LinkedIn](https://www.linkedin.com/in/nevinzheng/)
+📷 [Instagram](https://www.instagram.com/nevzheng/)
