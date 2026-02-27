@@ -9,7 +9,7 @@ import IconCoffee from "@/assets/icons/IconCoffee.svg";
 import LinkButton from "./LinkButton.astro";
 import { SITE } from "@/config";
 
-const base = import.meta.env.BASE_URL;
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 const { pathname } = Astro.url;
 
 // Remove trailing slash from current pathname if exists
