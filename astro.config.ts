@@ -13,8 +13,7 @@ import { SITE } from "./src/config";
 
 // https://astro.build/config
 export default defineConfig({
-  site: "https://nevzheng.github.io",
-  base: "/blog",
+  site: "https://n8z.dev",
   integrations: [
     sitemap({
       filter: page => SITE.showArchives || !page.endsWith("/archives"),

@@ -1,5 +1,5 @@
 export const SITE = {
-  website: "https://nevzheng.github.io/blog/",
+  website: "https://n8z.dev/",
   author: "Nevin Zheng",
   profile: "https://github.com/nevzheng",
   desc: "Project notes and things I'm learning.",

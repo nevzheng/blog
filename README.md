@@ -2,7 +2,7 @@
 
 Personal dev blog. Built with [Astro](https://astro.build/) + [AstroPaper](https://github.com/satnaing/astro-paper). Deployed to GitHub Pages.
 
-**Live:** https://nevzheng.github.io/blog/
+**Live:** https://n8z.dev/
 
 ## Development
 
