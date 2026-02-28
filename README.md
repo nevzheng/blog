@@ -38,18 +38,18 @@ Your markdown content here. Supports all standard markdown plus:
 
 ### Frontmatter fields
 
-| Field | Required | Description |
-|---|---|---|
-| `title` | Yes | Post title |
-| `description` | Yes | Short description (shows in cards and SEO) |
-| `pubDatetime` | Yes | Publish date in ISO 8601 format |
-| `tags` | No | Array of tags (defaults to `["others"]`) |
-| `draft` | No | Set `true` to hide from production |
-| `featured` | No | Set `true` to pin to homepage |
-| `modDatetime` | No | Last modified date |
-| `ogImage` | No | Custom OG image (auto-generated if omitted) |
-| `canonicalURL` | No | Canonical URL if cross-posting |
-| `author` | No | Defaults to site author |
+| Field          | Required | Description                                 |
+| -------------- | -------- | ------------------------------------------- |
+| `title`        | Yes      | Post title                                  |
+| `description`  | Yes      | Short description (shows in cards and SEO)  |
+| `pubDatetime`  | Yes      | Publish date in ISO 8601 format             |
+| `tags`         | No       | Array of tags (defaults to `["others"]`)    |
+| `draft`        | No       | Set `true` to hide from production          |
+| `featured`     | No       | Set `true` to pin to homepage               |
+| `modDatetime`  | No       | Last modified date                          |
+| `ogImage`      | No       | Custom OG image (auto-generated if omitted) |
+| `canonicalURL` | No       | Canonical URL if cross-posting              |
+| `author`       | No       | Defaults to site author                     |
 
 ### Organizing posts
 

@@ -91,7 +91,9 @@ const recentPosts = sortedPosts.filter(({ data }) => !data.featured);
     }
 
     <div class="my-8 text-center">
-      <LinkButton href={`${import.meta.env.BASE_URL.replace(/\/$/, "")}/posts/`}>
+      <LinkButton
+        href={`${import.meta.env.BASE_URL.replace(/\/$/, "")}/posts/`}
+      >
         All Posts
         <IconArrowRight class="inline-block rtl:-rotate-180" />
       </LinkButton>

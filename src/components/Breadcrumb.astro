@@ -28,7 +28,10 @@ if (breadcrumbList[0] === "tags" && !isNaN(Number(breadcrumbList[2]))) {
     class="font-light [&>li]:inline [&>li:not(:last-child)>a]:hover:opacity-100"
   >
     <li>
-      <a href={`${import.meta.env.BASE_URL.replace(/\/$/, "")}/`} class="opacity-80">Home</a>
+      <a
+        href={`${import.meta.env.BASE_URL.replace(/\/$/, "")}/`}
+        class="opacity-80">Home</a
+      >
       <span aria-hidden="true" class="opacity-80">&raquo;</span>
     </li>
     {
@@ -45,7 +48,10 @@ if (breadcrumbList[0] === "tags" && !isNaN(Number(breadcrumbList[2]))) {
           </li>
         ) : (
           <li>
-            <a href={`${import.meta.env.BASE_URL.replace(/\/$/, "")}/${breadcrumb}/`} class="capitalize opacity-70">
+            <a
+              href={`${import.meta.env.BASE_URL.replace(/\/$/, "")}/${breadcrumb}/`}
+              class="capitalize opacity-70"
+            >
               {breadcrumb}
             </a>
             <span aria-hidden="true">&raquo;</span>
