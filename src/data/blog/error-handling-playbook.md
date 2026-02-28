@@ -809,6 +809,10 @@ The best error handling code I've seen wasn't written in any particular language
 
 ---
 
+If this post helped you think differently about error handling — or gave you ammunition for your next code review — consider [buying me a coffee](https://ko-fi.com/nevzheng). ☕
+
+---
+
 ## 5. References
 
 - [Will Larson: "Describing fault domains"](https://lethain.com/fault-domains/) — The best bridge between hardware fault domains and software architecture. Defines fault domains, fault levels, fault hierarchies, and failure policies (redundant, ignorable, cascade). Practical and readable.
