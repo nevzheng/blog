@@ -69,9 +69,7 @@ jc   error_handler   ; jump if carry — our "if err != nil" circa 1978
 
 And if you didn't set up your error handlers? Before the watchdog timer existed, there was nothing. Your program hung and that was just... the state of things now. Your microcontroller stared into the void and the void stared back. Maybe someone noticed. Maybe they power-cycled it. Maybe the satellite was in orbit and nobody could reach it.
 
-The watchdog timer was invented because we learned the hard way that code will hang, and somebody has to be responsible for noticing. So we built a tiny hardware dead man's switch: pet the watchdog periodically to prove you're alive, or it reboots you. The first error recovery mechanism wasn't even software — it was a countdown timer and a hard reset line.
-
-Your program was food for that watchdog — the little hardware failsafe counting down in the background, waiting to hard-reset your system if your code stopped responding. No graceful degradation. No error log. Just a cold reboot and whatever state your device happened to be in when the watchdog bit.
+The watchdog timer was invented because we learned the hard way that code *will* hang, and somebody has to be responsible for noticing. So we built a tiny hardware dead man's switch: pet the watchdog periodically to prove you're alive, or it reboots you. The first error recovery mechanism wasn't even software — it was a countdown timer and a hard reset line. No graceful degradation. No error log. Just a cold reboot and whatever state your device happened to be in when the watchdog bit.
 
 ```c
 // On a microcontroller, this is still real life:
@@ -505,6 +503,8 @@ The origin story matters here. The Absl Status approach was codified in a concis
 Because `absl::Status` maps to gRPC codes, errors propagate cleanly across service boundaries. A `NOT_FOUND` returned from a storage layer becomes a `NOT_FOUND` in the gRPC response — no translation needed. This is genuinely amazing when you're operating at the scale of hundreds of internal services calling each other.
 
 **The con:** `INTERNAL` becomes a catch-all. When people don't know what error code to use, they reach for `INTERNAL`, which defeats the purpose of having canonical codes. It's the "throws Exception" of the Status world. This is a discipline problem, not a design problem — but it's common enough to mention.
+
+One thing worth calling out: the canonical codes implicitly encode *retryability*. `UNAVAILABLE` means "try again." `INVALID_ARGUMENT` means "don't bother — the input is wrong no matter how many times you send it." `DEADLINE_EXCEEDED` means "it might work if you give it more time." This isn't accidental — it's error domains applied to the *response*, not just the failure. Knowing whether an error is transient or permanent, and whether retrying is safe, is often more valuable than knowing exactly what went wrong. Good error codes should tell the caller what to *do*, not just what happened.
 
 **The other con:** This approach fundamentally only works inside of Google, or inside organizations that have fully standardized on Absl. It's not a universal solution — it's a demonstration of what standardization *can* achieve when you have the organizational will to enforce it.
 
