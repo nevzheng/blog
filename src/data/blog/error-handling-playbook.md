@@ -14,11 +14,13 @@ tags:
 
 _A survey of error handling across C, Go, Rust, and Google's Absl — and what I think works. Strong opinions, weakly held, gently shared._
 
+## Table of contents
+
 If you've spent any time building production systems, you know that error handling is one of those things that separates code that works on your laptop from code that works at 3 AM when something unexpected happens. I've worked with error handling across languages and environments — from Google's C++ codebase to Rust's ecosystem — and I've developed some strong opinions about what works and what doesn't.
 
 This isn't a tutorial. It's a set of principles I've arrived at through experience, a comparison of how popular languages and libraries measure up against those principles, and some hot takes you're welcome to argue with.
 
-## At the Dawn of the Unix Epoch
+## 1. At the Dawn of the Unix Epoch
 
 Before `Result<T, E>`, before `try/catch`, before `if err != nil`, before even `errno` — there was hardware.
 
@@ -95,7 +97,7 @@ We've gotten better at it. Mostly.
 
 ---
 
-## Principles
+## 2. Principles
 
 The first principle of error handling is accepting two things: Murphy's Law and a little bit of Zen.
 
@@ -111,7 +113,7 @@ The practical consequence is: stop trying to control every outcome. You can't. I
 
 This idea isn't new — embedded systems and safety-critical engineering have formalized it for decades as _error domains_ or _fault domains_. When you're designing avionics or medical devices, you don't get to hope that a failure in one subsystem won't cascade. You _prove_ it won't, with hardware partitioning and formal verification. Your car's infotainment system can crash without affecting your brakes — that's not luck, that's a deliberately enforced domain boundary. Software error handling is the same principle applied with less rigor and (usually) lower stakes — but the thinking is identical. Contain the fault. Protect what matters. Let what can fail, fail safely.
 
-### Think in Error Domains and Blast Radius
+### 2.1 Think in Error Domains and Blast Radius
 
 When an error occurs, the first question should be: _what's the scope of the failure?_
 
@@ -125,7 +127,7 @@ This is the most important principle and it directly informs why I prefer result
 
 At scale, the mantra is: **fail the request, not the process.**
 
-### The Happy Path Should Read Clean
+### 2.2 The Happy Path Should Read Clean
 
 When I open a file, I want to immediately understand what the code _does_. Error handling should be visible — I need to know where things can fail — but it shouldn't dominate the reading experience.
 
@@ -133,7 +135,7 @@ This is a spectrum. On one end, you have exception-based languages where the hap
 
 Rust's `?` operator nails this. A single character marks "this can fail, and if it does, we propagate the error." You see it, you know what it means, and it doesn't eat three lines of your function.
 
-### Errors Should Be Easy to Write AND Easy to Debug
+### 2.3 Errors Should Be Easy to Write AND Easy to Debug
 
 These are two different things and they're both important.
 
@@ -143,7 +145,7 @@ These are two different things and they're both important.
 
 The primary consumer of error output is a human being trying to figure out what went wrong. Design for that.
 
-### Error Taxonomy Tends Toward Bikeshedding
+### 2.4 Error Taxonomy Tends Toward Bikeshedding
 
 Here's my hot take: excessive classification of errors — elaborate enum hierarchies, deeply nested error types — often becomes bikeshedding.
 
@@ -151,7 +153,9 @@ Ask yourself honestly: how often do you actually _programmatically_ match on spe
 
 This doesn't mean error types don't matter. It means the energy you spend designing a perfect error hierarchy is often better spent on writing clear error messages and establishing consistent conventions across your team.
 
-### Good Machinery Makes It Easy to Do the Right Thing
+To be clear — a small, fixed, shared taxonomy like Absl's 17 canonical codes is very different from every team inventing bespoke error hierarchies. The value is in the _shared_ part, not the _elaborate_ part. If your whole org agrees on the same 17 codes, that's a standard. If every team designs their own artisanal error enum, that's where the bikeshedding creeps in.
+
+### 2.5 Good Machinery Makes It Easy to Do the Right Thing
 
 No amount of language features will save you from bad error design. But good machinery — good libraries, good conventions, good tooling — makes it dramatically more likely that people _will_ do the right thing.
 
@@ -161,11 +165,11 @@ This is ultimately an engineering discipline and organizational problem. Languag
 
 ---
 
-## The Comparison
+## 3. The Comparison
 
 With those principles in mind, let's walk through how popular approaches to error handling measure up.
 
-### C: The Baseline (It's Terrible)
+### 3.1 C: The Baseline (It's Terrible)
 
 C is where we all started, and it's instructive as a "before" picture of what we're trying to improve on.
 
@@ -203,9 +207,9 @@ int result = process_file("data.txt");
 
 Everything about this is painful. Error codes are just integers with no type safety. `errno` is global mutable state that any function call can silently overwrite. Nothing forces you to check return values. Every project invents its own conventions for what `-1` means. There are no standard error types, no standard error structs, no ergonomic way to propagate errors up the call stack.
 
-C error handling works only through sheer programming discipline, and discipline alone doesn't scale.
+C error handling works only through sheer programming discipline, and unaided discipline doesn't scale.
 
-### Exceptions: The Implicit Failure Path
+### 3.2 Exceptions: The Implicit Failure Path
 
 Exception-based languages — Java, Python, C#, and others — took a different approach: errors are thrown and caught, keeping the happy path clean.
 
@@ -214,7 +218,7 @@ def process_user_data(user_id: str) -> dict:
     # Look how clean this is! What could go wrong?
     config = load_config("settings.yaml")        # FileNotFoundError? YAMLError?
     db = connect_to_database(config["db_url"])    # ConnectionError? TimeoutError?
-    user = db.query(f"SELECT * FROM users WHERE id = {user_id}")  # SQLError? Injection?!
+    user = db.query("SELECT * FROM users WHERE id = %s", (user_id,))  # SQLError?
     profile = fetch_profile(user["profile_url"])  # HTTPError? JSONDecodeError?
     return merge_data(user, profile)              # TypeError? KeyError?
 
@@ -250,6 +254,8 @@ public UserData processUser(String userId) throws Exception {
 Here's the thing: you _can_ get good error handling with exceptions. If you keep functions small and focused, let exceptions propagate intentionally, annotate them with context at each level, and specify what can be thrown — you can get a similar effect to what result-based systems give you.
 
 But it doesn't work well in practice. The language makes it too easy to catch `Exception` and move on. Too easy to forget that a line of code can throw. Too easy to accidentally swallow an error in a `finally` block. The path of least resistance is `catch (Exception e)`, and that's what people reach for when they're tired or in a hurry.
+
+To be fair — there are large, well-run systems with excellent exception-based error handling. Spring's exception hierarchy, Python's ecosystem conventions, C#'s async exception patterns — these work in practice at real organizations with real discipline. The issue isn't that exceptions _can't_ work. It's that the failure mode is silent: when discipline slips, exceptions fail by hiding errors, while result types fail by being annoying. I'd rather have annoying.
 
 #### The Silent Swallow and the Invisible Rethrow
 
@@ -336,7 +342,7 @@ Exceptions invert this: the failure modes are invisible, the control flow is imp
 
 Exceptions don't explicitly annotate what can fail. They create invisible control flow. And they make it trivially easy to violate error domain boundaries — an uncaught exception can tear down your entire process when all you wanted was to fail a single request.
 
-### Go: Right Philosophy, Wrong Ergonomics
+### 3.3 Go: Right Philosophy, Wrong Ergonomics
 
 Go made a deliberate choice: errors are values, not exceptions. You return them explicitly and check them explicitly. This is philosophically correct.
 
@@ -427,7 +433,7 @@ But it's still opt-in and convention-driven. Nothing stops you from using `%v` i
 
 The Go experience reinforces a key point: **error handling is an organizational and tooling problem, not just a language problem.** The Go team decided that better IDE support, linters, and AI assistance are more promising paths than syntax changes.
 
-### Absl Status: Engineering Standardization Done Right
+### 3.4 Absl Status: Engineering Standardization Done Right
 
 Google's [C++ Style Guide](https://google.github.io/styleguide/cppguide.html#Exceptions) famously bans exceptions. The reasoning is practical, not ideological: in a codebase with hundreds of millions of lines of C++ that was never designed for exception safety, introducing exceptions would be a liability, not a feature. So Google needed an alternative — and [`absl::Status`](https://abseil.io/docs/cpp/guides/status) is what they built.
 
@@ -504,13 +510,17 @@ Because `absl::Status` maps to gRPC codes, errors propagate cleanly across servi
 
 **The con:** `INTERNAL` becomes a catch-all. When people don't know what error code to use, they reach for `INTERNAL`, which defeats the purpose of having canonical codes. It's the "throws Exception" of the Status world. This is a discipline problem, not a design problem — but it's common enough to mention.
 
-One thing worth calling out: the canonical codes implicitly encode _retryability_. `UNAVAILABLE` means "try again." `INVALID_ARGUMENT` means "don't bother — the input is wrong no matter how many times you send it." `DEADLINE_EXCEEDED` means "it might work if you give it more time." This isn't accidental — it's error domains applied to the _response_, not just the failure. Knowing whether an error is transient or permanent, and whether retrying is safe, is often more valuable than knowing exactly what went wrong. Good error codes should tell the caller what to _do_, not just what happened.
+One thing worth calling out: the canonical codes implicitly encode _retryability_. `UNAVAILABLE` means "try again." `INVALID_ARGUMENT` means "don't bother — the input is wrong no matter how many times you send it." `DEADLINE_EXCEEDED` means "it might work if you give it more time." This isn't accidental — it's error domains applied to the _response_, not just the failure. Knowing whether an error is transient or permanent, and whether retrying is safe, is often more valuable than knowing exactly what went wrong. Good error codes should tell the caller what to _do_, not just what happened. This isn't just conceptual — it maps directly to how real infrastructure behaves. Load balancers, service meshes, and retry middleware all consume these codes to decide whether to retry, reroute, or fail fast.
 
 **The other con:** This approach fundamentally only works inside of Google, or inside organizations that have fully standardized on Absl. It's not a universal solution — it's a demonstration of what standardization _can_ achieve when you have the organizational will to enforce it.
 
-### Rust: So Close to Perfect
+### 3.5 Rust: So Close to Perfect
+
+I'm going to spend more time on Rust than the other approaches — partly because it's my favorite, partly because the error handling ecosystem has more moving pieces worth explaining. Take that bias as disclosed.
 
 Rust is my favorite approach to error handling. It gets more right than any other language I've worked with. But it has real issues that are worth being honest about.
+
+One thing Rust gets fundamentally right: the distinction between `panic` and `Result` _is_ an error domain boundary. Panics are for programmer bugs — invariant violations, logic errors, things that should never happen. Results are for expected failures — network timeouts, missing files, bad input. Panics have process-level blast radius; Results have request-level blast radius. That's the error domain principle built directly into the language's type system.
 
 #### Result and the `?` Operator: The Gold Standard
 
@@ -632,7 +642,7 @@ The `?` operator and `From` trait handle much of this conversion automatically, 
 
 #### `From` Implicit Conversion: Useful but Watch Your Step
 
-The `From` trait enables implicit error conversion with `?`, which is powerful but has two failure modes worth knowing about:
+The `From` trait enables implicit error conversion with `?`, which is powerful but creates real risks when used carelessly.
 
 **The missing conversion** — the frustrating compiler error:
 
@@ -654,34 +664,51 @@ fn read_config() -> Result<Config, MyError> {
 
 This is confusing for newcomers. "I'm returning an error... why can't I use `?`?" The answer is that Rust needs an explicit conversion path between error types, which is type-safe and correct but can feel like fighting the compiler when you're just trying to propagate an error.
 
-**The silent conversion** — the sneaky footgun:
+**Context loss through careless conversion** — the common production footgun:
 
 ```rust
 #[derive(Error, Debug)]
-pub enum AppError {
-    #[error("IO error: {0}")]
-    Io(#[from] std::io::Error),
+pub enum ServiceError {
+    #[error("database error: {0}")]
+    Database(#[from] sqlx::Error),
 
-    #[error("Parse error: {0}")]
-    Parse(#[from] serde_json::Error),
-
-    // Blanket from for anything with Display:
-    #[error("Other: {0}")]
-    Other(#[from] anyhow::Error),
+    #[error("unexpected: {0}")]
+    Other(String),
 }
 
-fn risky_function() -> Result<(), AppError> {
-    // This io::Error silently becomes AppError::Io
-    // But what if we ALSO have a From<io::Error> for anyhow::Error in scope?
-    // Which conversion wins? Are we losing context in the conversion?
-    some_io_operation()?;
-    Ok(())
+// v1: careful conversion, typed error preserved
+fn get_user(id: &str) -> Result<User, ServiceError> {
+    let user = sqlx::query_as("SELECT ...")
+        .bind(id)
+        .fetch_one(&pool)
+        .await?;  // sqlx::Error -> ServiceError::Database ✓
+    Ok(user)
+}
+
+// v2: someone refactors through an anyhow layer
+fn get_user_v2(id: &str) -> Result<User, ServiceError> {
+    let user = some_anyhow_helper(id)  // returns anyhow::Error
+        .await
+        .map_err(|e| ServiceError::Other(e.to_string()))?;
+    // The sqlx::Error inside the anyhow::Error just got
+    // flattened to a string. The typed error is gone.
+    // Downstream code matching on ServiceError::Database?
+    // Silently stops working. No compiler warning.
+    Ok(user)
 }
 ```
 
-When a blanket `From` impl exists and silently converts an error you didn't expect, you can get unexpected behavior downstream. The error type changes, context gets dropped, and suddenly your error handling code that matches on `AppError::Io` isn't triggering because the error went through a different conversion path.
+This is the most common `From`-related footgun in practice. Someone wraps a typed error into `anyhow::Error` or `String` during a refactor, and downstream match arms silently stop firing. The types all check out. The code compiles. You just lost your error domain boundary — the caller can no longer distinguish "database timeout, safe to retry" from "unexpected failure, don't retry." That's not a cosmetic problem; it's a blast radius problem.
 
-To be pragmatic about this: the silent conversion footgun isn't _super_ likely to bite you in practice, but it's absolutely possible, especially in larger codebases with many error types and blanket `From` implementations. The real lesson is: **you need a coherent error conversion strategy**. Decide up front how errors flow through your system, document it, and be intentional about your `From` implementations.
+To be fair — flattening errors is sometimes exactly what you want. If you're crossing an API boundary and the caller has no business knowing about your internal database schema, converting `sqlx::Error` into `ServiceError::Other("storage unavailable")` is good hygiene — it's the error domain principle in action. The problem isn't flattening itself. It's _accidental_ flattening: when context gets stripped not because someone made a design decision, but because someone used `.to_string()` or a blanket `From` impl without thinking about what information the caller needs. Intentional recontextualization is an API design choice. Accidental context loss is a bug that the compiler won't catch.
+
+**Unexpected implicit conversion** — the rarer but scarier case:
+
+When you have multiple `From` implementations in scope — especially blanket impls or long chains of conversions — it's possible for `?` to route an error through a conversion path you didn't intend. The compiler picks a valid path, but not necessarily the path you expected. The error arrives at the caller with the wrong type, the wrong context, or both. This is hard to trigger accidentally in small codebases, but in larger systems with many error types and `From` impls accumulating over time, it becomes a real risk. The failure mode is particularly insidious: the code compiles, tests pass (because tests rarely exercise the exact error conversion path), and the bug surfaces at 2 AM when a specific error takes a wrong turn and causes a handler to make the wrong decision.
+
+Both of these are fundamentally **error domain violations**. The whole point of typed errors is that they carry meaning across boundaries — "this is a retryable database failure" vs. "this is a permanent validation error." When a conversion silently strips that meaning, you've breached the domain boundary just as surely as an uncaught exception unwinding past your error handler. The type system gave you a wall; the `From` impl put a hole in it.
+
+The practical lesson: **treat `From` implementations as API contracts, not convenience methods.** Review them in code review the way you'd review a public function signature. Be intentional about what context survives the conversion. And when you're stitching together libraries with different error types, choose your conversion strategy deliberately — don't let it accumulate by accident.
 
 #### `unwrap()`: Fine for Development, Keep It Out of Production
 
@@ -743,9 +770,9 @@ The ecosystem arrived at good conventions through community consensus rather tha
 
 ---
 
-## Closing Thoughts
+## 4. Closing Thoughts
 
-### Error Domains are Everything
+### 4.1 Error Domains are Everything
 
 Everything in this article flows from one question: **when something fails, what else breaks?**
 
@@ -753,7 +780,9 @@ If your answer is "just this request" — you're in good shape. If it's "maybe t
 
 If you get the blast radius right, everything else is details.
 
-### Mechanics Help, Discipline Decides
+One caveat: these principles are most battle-tested in long-running services and servers. If you're building a CLI, a game engine, or an embedded system, the boundaries look different — Erlang built an entire philosophy around "let it crash" and it works beautifully. The thinking is the same; the blast radius just changes shape.
+
+### 4.2 Mechanics Help, Discipline Decides
 
 Your error handling is only as good as the engineers and the organization behind it. No amount of clever language features will save you from:
 
@@ -766,7 +795,7 @@ But good machinery _does_ make it easier to do the right thing. A type system th
 
 **Make it easy to do the right thing. Make the wrong thing hard.**
 
-### My Recommendations
+### 4.3 My Recommendations
 
 **Absl Status** is still my favorite, but mostly for standardization reasons. The power isn't in the `Status` type itself — it's in the fact that every C++ engineer at Google speaks the same error language. The canonical codes, the macros, the propagation across gRPC boundaries — it all works because of organizational commitment. It's a proof of what's possible when an entire organization agrees on error handling conventions.
 
@@ -780,7 +809,7 @@ The best error handling code I've seen wasn't written in any particular language
 
 ---
 
-## References
+## 5. References
 
 - [Will Larson: "Describing fault domains"](https://lethain.com/fault-domains/) — The best bridge between hardware fault domains and software architecture. Defines fault domains, fault levels, fault hierarchies, and failure policies (redundant, ignorable, cascade). Practical and readable.
 
