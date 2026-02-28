@@ -12,7 +12,7 @@ tags:
   - systems
 ---
 
-*A survey of error handling across C, Go, Rust, and Google's Absl — and what I think works. Strong opinions, weakly held, gently shared.*
+_A survey of error handling across C, Go, Rust, and Google's Absl — and what I think works. Strong opinions, weakly held, gently shared._
 
 If you've spent any time building production systems, you know that error handling is one of those things that separates code that works on your laptop from code that works at 3 AM when something unexpected happens. I've worked with error handling across languages and environments — from Google's C++ codebase to Rust's ecosystem — and I've developed some strong opinions about what works and what doesn't.
 
@@ -69,7 +69,7 @@ jc   error_handler   ; jump if carry — our "if err != nil" circa 1978
 
 And if you didn't set up your error handlers? Before the watchdog timer existed, there was nothing. Your program hung and that was just... the state of things now. Your microcontroller stared into the void and the void stared back. Maybe someone noticed. Maybe they power-cycled it. Maybe the satellite was in orbit and nobody could reach it.
 
-The watchdog timer was invented because we learned the hard way that code *will* hang, and somebody has to be responsible for noticing. So we built a tiny hardware dead man's switch: pet the watchdog periodically to prove you're alive, or it reboots you. The first error recovery mechanism wasn't even software — it was a countdown timer and a hard reset line. No graceful degradation. No error log. Just a cold reboot and whatever state your device happened to be in when the watchdog bit.
+The watchdog timer was invented because we learned the hard way that code _will_ hang, and somebody has to be responsible for noticing. So we built a tiny hardware dead man's switch: pet the watchdog periodically to prove you're alive, or it reboots you. The first error recovery mechanism wasn't even software — it was a countdown timer and a hard reset line. No graceful degradation. No error log. Just a cold reboot and whatever state your device happened to be in when the watchdog bit.
 
 ```c
 // On a microcontroller, this is still real life:
@@ -89,7 +89,7 @@ void HardFault_Handler(void) {
 
 This isn't ancient history. If you're writing firmware, working on embedded systems, or programming microcontrollers, this is Tuesday. The STM32 on your desk right now has a `HardFault_Handler` and a watchdog timer, and if you don't respect them, your drone falls out of the sky or your medical device does something you'll be explaining to a regulator.
 
-No types. No stack traces. No error messages. Just a bit in a register, a conditional jump, and a watchdog waiting to eat your lunch. Everything we'll talk about in this post — every language feature, every library, every heated debate about `?` vs `try/catch` — is descended from this. We've spent 40+ years building increasingly sophisticated answers to the same question the CPU asked at boot: *"something went wrong — now what?"*
+No types. No stack traces. No error messages. Just a bit in a register, a conditional jump, and a watchdog waiting to eat your lunch. Everything we'll talk about in this post — every language feature, every library, every heated debate about `?` vs `try/catch` — is descended from this. We've spent 40+ years building increasingly sophisticated answers to the same question the CPU asked at boot: _"something went wrong — now what?"_
 
 We've gotten better at it. Mostly.
 
@@ -99,21 +99,21 @@ We've gotten better at it. Mostly.
 
 The first principle of error handling is accepting two things: Murphy's Law and a little bit of Zen.
 
-Something *will* go wrong. Your network call will timeout. Your database will hiccup. Your user will send you something absolutely unhinged. A cosmic ray will flip a bit. This isn't pessimism — it's the first honest thing you can say about any system of sufficient complexity.
+Something _will_ go wrong. Your network call will timeout. Your database will hiccup. Your user will send you something absolutely unhinged. A cosmic ray will flip a bit. This isn't pessimism — it's the first honest thing you can say about any system of sufficient complexity.
 
-The question was never *"will something fail?"* — it was always *"when it fails, what happens to everything around it?"*
+The question was never _"will something fail?"_ — it was always _"when it fails, what happens to everything around it?"_
 
-That reframe changes everything. Error handling isn't defensive boilerplate you sprinkle on after the real code is written. It *is* the design. The happy path is the easy part — any junior engineer can write code that works when everything goes right. The craft is in what happens when things don't.
+That reframe changes everything. Error handling isn't defensive boilerplate you sprinkle on after the real code is written. It _is_ the design. The happy path is the easy part — any junior engineer can write code that works when everything goes right. The craft is in what happens when things don't.
 
 Once you internalize that — really internalize it, not just nod at it — the rest follows naturally.
 
 The practical consequence is: stop trying to control every outcome. You can't. Instead, think in terms of containment. A firefighter doesn't try to stop every fire from ever starting — they build firebreaks, they decide which sections can burn, and they protect what matters most. Error handling is the same discipline. Define your boundaries. Know your blast radius. If this request fails, that's fine — the user gets an error. If this request takes down the database connection pool, that's a five-alarm fire. The difference isn't luck. It's design.
 
-This idea isn't new — embedded systems and safety-critical engineering have formalized it for decades as *error domains* or *fault domains*. When you're designing avionics or medical devices, you don't get to hope that a failure in one subsystem won't cascade. You *prove* it won't, with hardware partitioning and formal verification. Your car's infotainment system can crash without affecting your brakes — that's not luck, that's a deliberately enforced domain boundary. Software error handling is the same principle applied with less rigor and (usually) lower stakes — but the thinking is identical. Contain the fault. Protect what matters. Let what can fail, fail safely.
+This idea isn't new — embedded systems and safety-critical engineering have formalized it for decades as _error domains_ or _fault domains_. When you're designing avionics or medical devices, you don't get to hope that a failure in one subsystem won't cascade. You _prove_ it won't, with hardware partitioning and formal verification. Your car's infotainment system can crash without affecting your brakes — that's not luck, that's a deliberately enforced domain boundary. Software error handling is the same principle applied with less rigor and (usually) lower stakes — but the thinking is identical. Contain the fault. Protect what matters. Let what can fail, fail safely.
 
 ### Think in Error Domains and Blast Radius
 
-When an error occurs, the first question should be: *what's the scope of the failure?*
+When an error occurs, the first question should be: _what's the scope of the failure?_
 
 This is what I call the error domain — the boundary of what a failure can affect. Good error handling is fundamentally about **containment**. In a well-designed system:
 
@@ -121,13 +121,13 @@ This is what I call the error domain — the boundary of what a failure can affe
 - **A bad request does NOT crash the service.** Other users, other requests — they should be completely unaffected.
 - **A bad request does NOT corrupt shared state.** If a failure can poison your database or leave a cache in an inconsistent state, you have a design problem, not just an error handling problem.
 
-This is the most important principle and it directly informs why I prefer result/status-based error handling over exceptions. Exceptions make it dangerously easy to accidentally unwind past the boundaries you intended, tearing down a connection pool or leaving a mutex locked. Status-based returns naturally encourage you to handle errors at the right level — because you *have to* deal with the return value.
+This is the most important principle and it directly informs why I prefer result/status-based error handling over exceptions. Exceptions make it dangerously easy to accidentally unwind past the boundaries you intended, tearing down a connection pool or leaving a mutex locked. Status-based returns naturally encourage you to handle errors at the right level — because you _have to_ deal with the return value.
 
 At scale, the mantra is: **fail the request, not the process.**
 
 ### The Happy Path Should Read Clean
 
-When I open a file, I want to immediately understand what the code *does*. Error handling should be visible — I need to know where things can fail — but it shouldn't dominate the reading experience.
+When I open a file, I want to immediately understand what the code _does_. Error handling should be visible — I need to know where things can fail — but it shouldn't dominate the reading experience.
 
 This is a spectrum. On one end, you have exception-based languages where the happy path looks clean but failure paths are completely invisible. On the other end, you have Go, where `if err != nil` blocks are so pervasive they drown out the actual logic. The sweet spot is somewhere in between: **error handling should be annotated but not overwhelming.**
 
@@ -139,7 +139,7 @@ These are two different things and they're both important.
 
 **Easy to write** means: when I'm implementing a function, creating and returning an error shouldn't require a bunch of boilerplate. If it's annoying to do the right thing, people will do the wrong thing — they'll return a generic error, or worse, just unwrap and hope for the best.
 
-**Easy to debug** means: when I'm staring at a log at 2 AM, the error should tell me *what happened* in human-readable terms. Stack traces are a mechanical representation — they tell you *where* code executed, but not *why* or *what was being attempted*. What you actually want is context: "Failed to load user profile for user_id=12345 from the accounts service." That's actionable. A mangled stack trace through three layers of async runtime is not.
+**Easy to debug** means: when I'm staring at a log at 2 AM, the error should tell me _what happened_ in human-readable terms. Stack traces are a mechanical representation — they tell you _where_ code executed, but not _why_ or _what was being attempted_. What you actually want is context: "Failed to load user profile for user_id=12345 from the accounts service." That's actionable. A mangled stack trace through three layers of async runtime is not.
 
 The primary consumer of error output is a human being trying to figure out what went wrong. Design for that.
 
@@ -147,13 +147,13 @@ The primary consumer of error output is a human being trying to figure out what 
 
 Here's my hot take: excessive classification of errors — elaborate enum hierarchies, deeply nested error types — often becomes bikeshedding.
 
-Ask yourself honestly: how often do you actually *programmatically* match on specific error types to change behavior at runtime? For **library code**, it matters — your callers need to know if they got a "not found" vs. "permission denied" so they can react differently. For **application code** stitching libraries together? Most of the time you're logging the error and returning a 500 to the user. You need a good message, not a precise taxonomy.
+Ask yourself honestly: how often do you actually _programmatically_ match on specific error types to change behavior at runtime? For **library code**, it matters — your callers need to know if they got a "not found" vs. "permission denied" so they can react differently. For **application code** stitching libraries together? Most of the time you're logging the error and returning a 500 to the user. You need a good message, not a precise taxonomy.
 
 This doesn't mean error types don't matter. It means the energy you spend designing a perfect error hierarchy is often better spent on writing clear error messages and establishing consistent conventions across your team.
 
 ### Good Machinery Makes It Easy to Do the Right Thing
 
-No amount of language features will save you from bad error design. But good machinery — good libraries, good conventions, good tooling — makes it dramatically more likely that people *will* do the right thing.
+No amount of language features will save you from bad error design. But good machinery — good libraries, good conventions, good tooling — makes it dramatically more likely that people _will_ do the right thing.
 
 The best error handling systems are the ones where the path of least resistance is also the correct path. If returning a properly annotated error is easier than ignoring it, people will return properly annotated errors. If it's a pain, they won't.
 
@@ -247,7 +247,7 @@ public UserData processUser(String userId) throws Exception {
 }
 ```
 
-Here's the thing: you *can* get good error handling with exceptions. If you keep functions small and focused, let exceptions propagate intentionally, annotate them with context at each level, and specify what can be thrown — you can get a similar effect to what result-based systems give you.
+Here's the thing: you _can_ get good error handling with exceptions. If you keep functions small and focused, let exceptions propagate intentionally, annotate them with context at each level, and specify what can be thrown — you can get a similar effect to what result-based systems give you.
 
 But it doesn't work well in practice. The language makes it too easy to catch `Exception` and move on. Too easy to forget that a line of code can throw. Too easy to accidentally swallow an error in a `finally` block. The path of least resistance is `catch (Exception e)`, and that's what people reach for when they're tired or in a hurry.
 
@@ -421,7 +421,7 @@ if errors.As(err, &pgErr) {
 }
 ```
 
-This is a significant improvement over Go's original "errors are just strings" story. `%w` wrapping preserves the error chain so callers can inspect *what* failed without parsing messages. `errors.Is()` walks the chain looking for a specific sentinel value; `errors.As()` walks it looking for a specific type.
+This is a significant improvement over Go's original "errors are just strings" story. `%w` wrapping preserves the error chain so callers can inspect _what_ failed without parsing messages. `errors.Is()` walks the chain looking for a specific sentinel value; `errors.As()` walks it looking for a specific type.
 
 But it's still opt-in and convention-driven. Nothing stops you from using `%v` instead of `%w` (which discards the chain), or from skipping sentinel errors entirely and just returning `fmt.Errorf("something broke")`. The machinery exists, but the language doesn't push you toward using it — and in practice, a lot of Go code still doesn't.
 
@@ -459,20 +459,20 @@ absl::StatusOr<UserProfile> GetUserProfile(absl::string_view user_id) {
 
 The canonical error codes are the same 17 codes used by gRPC everywhere. The most commonly used ones:
 
-| Code | When to Use |
-|------|------------|
-| `OK` | Success |
-| `INVALID_ARGUMENT` | Client sent bad input (regardless of system state) |
-| `NOT_FOUND` | Requested entity doesn't exist |
-| `ALREADY_EXISTS` | Tried to create something that already exists |
-| `PERMISSION_DENIED` | Caller lacks permission |
-| `UNAUTHENTICATED` | Caller's identity cannot be verified |
-| `RESOURCE_EXHAUSTED` | Quota or resource limit hit |
-| `FAILED_PRECONDITION` | System not in required state |
-| `UNAVAILABLE` | Service temporarily unavailable (retry) |
-| `INTERNAL` | Something broke inside (the catch-all) |
-| `UNIMPLEMENTED` | Operation not supported |
-| `DEADLINE_EXCEEDED` | Operation timed out |
+| Code                  | When to Use                                        |
+| --------------------- | -------------------------------------------------- |
+| `OK`                  | Success                                            |
+| `INVALID_ARGUMENT`    | Client sent bad input (regardless of system state) |
+| `NOT_FOUND`           | Requested entity doesn't exist                     |
+| `ALREADY_EXISTS`      | Tried to create something that already exists      |
+| `PERMISSION_DENIED`   | Caller lacks permission                            |
+| `UNAUTHENTICATED`     | Caller's identity cannot be verified               |
+| `RESOURCE_EXHAUSTED`  | Quota or resource limit hit                        |
+| `FAILED_PRECONDITION` | System not in required state                       |
+| `UNAVAILABLE`         | Service temporarily unavailable (retry)            |
+| `INTERNAL`            | Something broke inside (the catch-all)             |
+| `UNIMPLEMENTED`       | Operation not supported                            |
+| `DEADLINE_EXCEEDED`   | Operation timed out                                |
 
 The full list of all 17 codes is defined in [`google.rpc.Code`](https://github.com/googleapis/googleapis/blob/master/google/rpc/code.proto).
 
@@ -504,9 +504,9 @@ Because `absl::Status` maps to gRPC codes, errors propagate cleanly across servi
 
 **The con:** `INTERNAL` becomes a catch-all. When people don't know what error code to use, they reach for `INTERNAL`, which defeats the purpose of having canonical codes. It's the "throws Exception" of the Status world. This is a discipline problem, not a design problem — but it's common enough to mention.
 
-One thing worth calling out: the canonical codes implicitly encode *retryability*. `UNAVAILABLE` means "try again." `INVALID_ARGUMENT` means "don't bother — the input is wrong no matter how many times you send it." `DEADLINE_EXCEEDED` means "it might work if you give it more time." This isn't accidental — it's error domains applied to the *response*, not just the failure. Knowing whether an error is transient or permanent, and whether retrying is safe, is often more valuable than knowing exactly what went wrong. Good error codes should tell the caller what to *do*, not just what happened.
+One thing worth calling out: the canonical codes implicitly encode _retryability_. `UNAVAILABLE` means "try again." `INVALID_ARGUMENT` means "don't bother — the input is wrong no matter how many times you send it." `DEADLINE_EXCEEDED` means "it might work if you give it more time." This isn't accidental — it's error domains applied to the _response_, not just the failure. Knowing whether an error is transient or permanent, and whether retrying is safe, is often more valuable than knowing exactly what went wrong. Good error codes should tell the caller what to _do_, not just what happened.
 
-**The other con:** This approach fundamentally only works inside of Google, or inside organizations that have fully standardized on Absl. It's not a universal solution — it's a demonstration of what standardization *can* achieve when you have the organizational will to enforce it.
+**The other con:** This approach fundamentally only works inside of Google, or inside organizations that have fully standardized on Absl. It's not a universal solution — it's a demonstration of what standardization _can_ achieve when you have the organizational will to enforce it.
 
 ### Rust: So Close to Perfect
 
@@ -563,13 +563,13 @@ fn load_config(path: &str) -> Result<Config> {
 //     No such file or directory (os error 2)
 ```
 
-That error output is *exactly* what you want during an incident. Human-readable, contextual, actionable. The `.context()` and `.with_context()` methods let you build up a chain of "what was happening when this failed" annotations — which is far more useful for debugging than a raw stack trace.
+That error output is _exactly_ what you want during an incident. Human-readable, contextual, actionable. The `.context()` and `.with_context()` methods let you build up a chain of "what was happening when this failed" annotations — which is far more useful for debugging than a raw stack trace.
 
 This is the best compromise approach for application code. You lose the ability to programmatically match on specific error types, but you gain ergonomics and excellent debugging output. For applications that are stitching libraries together, that's usually the right trade-off.
 
 #### thiserror: Structured Errors for Libraries
 
-When you *do* need callers to distinguish between error types — i.e., you're writing a library — [`thiserror`](https://github.com/dtolnay/thiserror) provides a clean declarative interface:
+When you _do_ need callers to distinguish between error types — i.e., you're writing a library — [`thiserror`](https://github.com/dtolnay/thiserror) provides a clean declarative interface:
 
 ```rust
 use thiserror::Error;
@@ -604,7 +604,7 @@ The common wisdom — `thiserror` for libraries, `anyhow` for applications — i
 
 #### The Error Domain Conversion Problem
 
-Here's where Rust's error handling gets messy. Rust has `Result<T, E>` as a standard, but there's no standard *error type*. Every library defines its own. This means you constantly need to convert between error domains:
+Here's where Rust's error handling gets messy. Rust has `Result<T, E>` as a standard, but there's no standard _error type_. Every library defines its own. This means you constantly need to convert between error domains:
 
 ```rust
 // Your function calls three libraries. Each has its own error type.
@@ -681,7 +681,7 @@ fn risky_function() -> Result<(), AppError> {
 
 When a blanket `From` impl exists and silently converts an error you didn't expect, you can get unexpected behavior downstream. The error type changes, context gets dropped, and suddenly your error handling code that matches on `AppError::Io` isn't triggering because the error went through a different conversion path.
 
-To be pragmatic about this: the silent conversion footgun isn't *super* likely to bite you in practice, but it's absolutely possible, especially in larger codebases with many error types and blanket `From` implementations. The real lesson is: **you need a coherent error conversion strategy**. Decide up front how errors flow through your system, document it, and be intentional about your `From` implementations.
+To be pragmatic about this: the silent conversion footgun isn't _super_ likely to bite you in practice, but it's absolutely possible, especially in larger codebases with many error types and blanket `From` implementations. The real lesson is: **you need a coherent error conversion strategy**. Decide up front how errors flow through your system, document it, and be intentional about your `From` implementations.
 
 #### `unwrap()`: Fine for Development, Keep It Out of Production
 
@@ -701,7 +701,7 @@ let config = load_config().expect("Config file must exist at startup");
 // At least when it panics, you get a message explaining the invariant.
 ```
 
-I'm a fan of `unwrap()` during development. It keeps you moving. But it should not make it into production code. Use `expect()` with a message explaining *why* you believe this can't fail, or better yet, handle the error properly.
+I'm a fan of `unwrap()` during development. It keeps you moving. But it should not make it into production code. Use `expect()` with a message explaining _why_ you believe this can't fail, or better yet, handle the error properly.
 
 There are edge cases where an `unwrap()` is genuinely safe — you've already validated the precondition, or the value is hardcoded — and accepting the risk of a crash in those cases is a reasonable engineering decision. But these should be the exception, explicitly justified, not the default.
 
@@ -711,7 +711,7 @@ Rust's error handling takes a real hit when it comes to debugging. Because error
 
 When you do get a stack trace (via `RUST_BACKTRACE=1` or anyhow's backtrace capture), it's often aggressively mangled — full of async runtime internals, monomorphized generic names, and framework boilerplate that obscures the actual application code.
 
-This is where human-readable context annotations become critical. The `.context()` chain that anyhow provides isn't just nice to have — it's your *primary* debugging tool in Rust. You're building a semantic trace of what was happening, rather than relying on a mechanical trace of where code executed.
+This is where human-readable context annotations become critical. The `.context()` chain that anyhow provides isn't just nice to have — it's your _primary_ debugging tool in Rust. You're building a semantic trace of what was happening, rather than relying on a mechanical trace of where code executed.
 
 ```txt
 // A raw Rust backtrace might give you:
@@ -735,9 +735,9 @@ For larger systems, this is also where distributed tracing frameworks (spans, tr
 
 #### What Rust Gets Right Despite All This
 
-Here's what's remarkable: Rust manages to standardize on `Result` and have genuinely great error handling ergonomics *despite* not fully solving the error domain problem at the standard library level.
+Here's what's remarkable: Rust manages to standardize on `Result` and have genuinely great error handling ergonomics _despite_ not fully solving the error domain problem at the standard library level.
 
-The `?` operator is the gold standard for annotating fallible operations. `anyhow` and `thiserror` together cover the application/library split cleanly. The compiler *forces* you to handle errors — you can't accidentally ignore a `Result` without the compiler warning you.
+The `?` operator is the gold standard for annotating fallible operations. `anyhow` and `thiserror` together cover the application/library split cleanly. The compiler _forces_ you to handle errors — you can't accidentally ignore a `Result` without the compiler warning you.
 
 The ecosystem arrived at good conventions through community consensus rather than top-down standardization, and that's impressive. It's not as clean as Absl's organization-wide mandate, but it works remarkably well for an open ecosystem.
 
@@ -762,7 +762,7 @@ Your error handling is only as good as the engineers and the organization behind
 - Missing context in error messages because adding it was too much work
 - No shared conventions across the team
 
-But good machinery *does* make it easier to do the right thing. A type system that forces you to handle errors (Rust) is better than one that lets you ignore them (C). Ergonomic macros (`RETURN_IF_ERROR`, `?`) are better than three lines of boilerplate per check. Standard error codes that propagate across service boundaries (Absl + gRPC) are better than every team inventing their own.
+But good machinery _does_ make it easier to do the right thing. A type system that forces you to handle errors (Rust) is better than one that lets you ignore them (C). Ergonomic macros (`RETURN_IF_ERROR`, `?`) are better than three lines of boilerplate per check. Standard error codes that propagate across service boundaries (Absl + gRPC) are better than every team inventing their own.
 
 **Make it easy to do the right thing. Make the wrong thing hard.**
 
