@@ -811,6 +811,8 @@ The best error handling code I've seen wasn't written in any particular language
 
 If this post helped you think differently about error handling — or gave you ammunition for your next code review — consider [buying me a coffee](https://ko-fi.com/nevzheng). ☕
 
+[Discuss on Hacker News](https://news.ycombinator.com/item?id=47196289)
+
 ---
 
 ## 5. References
