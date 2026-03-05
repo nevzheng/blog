@@ -76,6 +76,8 @@ I might write up some technical deep dives later if I feel like it. No promises.
 
 If you enjoyed this post or found it useful, consider [buying me a coffee](https://ko-fi.com/nevzheng). ☕
 
+[Discuss on Hacker News](https://news.ycombinator.com/item?id=47266321)
+
 ## Related Projects
 
 If you're interested in storage engines, these are worth looking at:
