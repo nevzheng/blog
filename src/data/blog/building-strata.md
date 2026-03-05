@@ -74,6 +74,8 @@ If you're curious, the code is at [github.com/nevzheng/strata-db](https://github
 
 I might write up some technical deep dives later if I feel like it. No promises.
 
+If you enjoyed this post or found it useful, consider [buying me a coffee](https://ko-fi.com/nevzheng). ☕
+
 ## Related Projects
 
 If you're interested in storage engines, these are worth looking at:
