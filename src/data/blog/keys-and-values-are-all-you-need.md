@@ -304,4 +304,4 @@ If you're curious, the code is at [github.com/nevzheng/strata-db](https://github
 
 If you enjoyed this post or found it useful, consider [buying me a coffee](https://ko-fi.com/nevzheng).
 
-[Discuss on Hacker News](https://news.ycombinator.com/item?id=)
+[Discuss on Hacker News](https://news.ycombinator.com/item?id=48154631)
