@@ -1,5 +1,6 @@
-IBM Plex Sans, by IBM, licensed under the SIL Open Font License 1.1 (OFL.txt;
-https://github.com/IBM/plex).
+IBM Plex Sans, by IBM, licensed under the SIL Open Font License 1.1 (https://openfontlicense.org;
+https://github.com/IBM/plex). Each font file carries its copyright and
+license notice in its metadata, as the OFL allows.
 
 The font files are not committed. `npm run fonts` (scripts/fetch-fonts.mjs)
 downloads a pinned release, checks each file's SHA-256, and writes:
