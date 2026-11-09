@@ -41,7 +41,7 @@
     "globals": "^16.5.0",
     "pagefind": "^1.4.0",
     "prettier": "^3.7.4",
-    "prettier-plugin-astro": "^0.14.1",
+    "prettier-plugin-astro": "^1.1.2",
     "prettier-plugin-tailwindcss": "^0.7.2",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.51.0"
