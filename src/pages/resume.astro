@@ -3,7 +3,14 @@ import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
 import { SITE } from "@/config";
-import { resume, contactParts, dateRange, workGroups } from "@/utils/resume";
+import {
+  resume,
+  contactParts,
+  dateRange,
+  downloadName,
+  richHtml,
+  workGroups,
+} from "@/utils/resume";
 
 const b = resume.basics;
 ---
@@ -12,8 +19,12 @@ const b = resume.basics;
   <Header />
   <main id="main-content" class="app-layout">
     <div class="mt-6 mb-6 flex flex-wrap gap-3 text-sm">
-      <a class="download" href="/resume.pdf" download>Download PDF</a>
-      <a class="download" href="/resume.md" download>Download Markdown</a>
+      <a class="download" href="/resume.pdf" download={downloadName("pdf")}
+        >Download PDF</a
+      >
+      <a class="download" href="/resume.md" download={downloadName("md")}
+        >Download Markdown</a
+      >
     </div>
 
     <article class="resume mb-28">
@@ -31,7 +42,7 @@ const b = resume.basics;
 
       <section>
         <h2>Summary</h2>
-        <p>{b.summary}</p>
+        <p set:html={richHtml(b.summary)} />
       </section>
 
       <section>
@@ -47,7 +58,7 @@ const b = resume.basics;
               </p>
               {"summary" in w && w.summary && (
                 <p>
-                  <em>{w.summary}</em>
+                  <em set:html={richHtml(w.summary)} />
                 </p>
               )}
               {workGroups(w).map(g => (
@@ -59,7 +70,7 @@ const b = resume.basics;
                   )}
                   <ul>
                     {g.items.map(item => (
-                      <li>{item}</li>
+                      <li set:html={richHtml(item)} />
                     ))}
                   </ul>
                 </>
@@ -76,7 +87,8 @@ const b = resume.basics;
             resume.projects.map(p => (
               <li>
                 {p.url ? <a href={p.url}>{p.name}</a> : p.name}
-                {` (${p.keywords.join(", ")}): ${p.description}`}
+                {` (${p.keywords.join(", ")}): `}
+                <Fragment set:html={richHtml(p.description)} />
               </li>
             ))
           }

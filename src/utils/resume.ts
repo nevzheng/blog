@@ -4,9 +4,36 @@ import data from "../../resume/resume.json";
 
 export const resume = data;
 
+/** Download filename, e.g. Nevin_Zheng_Resume_2026-11.pdf */
+export function downloadName(ext: "pdf" | "md"): string {
+  const name = data.basics.name.replace(/\s+/g, "_");
+  const month = data.meta.lastModified.slice(0, 7);
+  return `${name}_Resume_${month}.${ext}`;
+}
+
 type Work = (typeof data.work)[number] & {
   "x-groups"?: { title: string; highlights: number[] }[];
 };
+
+const LINK = /\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g;
+
+/** HTML for a text field, turning Markdown-style [label](url) into links. */
+export function richHtml(text: string): string {
+  const esc = (t: string) =>
+    t
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  let out = "";
+  let last = 0;
+  for (const m of text.matchAll(LINK)) {
+    out += esc(text.slice(last, m.index));
+    out += `<a href="${esc(m[2])}">${esc(m[1])}</a>`;
+    last = (m.index ?? 0) + m[0].length;
+  }
+  return out + esc(text.slice(last));
+}
 
 const MONTHS = "Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec".split(" ");
 
@@ -67,7 +94,9 @@ export function toMarkdown(): string {
   }
   out.push("## Projects", "");
   for (const p of data.projects)
-    out.push(`- ${p.name} (${p.keywords.join(", ")}): ${p.description}`);
+    out.push(
+      `- ${p.url ? `[${p.name}](${p.url})` : p.name} (${p.keywords.join(", ")}): ${p.description}`
+    );
   out.push("", "## Technical Skills", "");
   for (const s of data.skills)
     out.push(`- ${s.name}: ${s.keywords.join(", ")}`);

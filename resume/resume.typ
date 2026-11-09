@@ -45,7 +45,18 @@
   v(0.15em)
 }
 
-#let bullets(items) = list(..items.map(i => [#i]))
+// Text fields may contain Markdown-style links: [label](https://...)
+#let rich(s) = {
+  let pos = 0
+  for m in s.matches(regex("\\[([^\\]]+)\\]\\(([^)]+)\\)")) {
+    s.slice(pos, m.start)
+    link(m.captures.at(1), m.captures.at(0))
+    pos = m.end
+  }
+  s.slice(pos)
+}
+
+#let bullets(items) = list(..items.map(i => rich(i)))
 
 // ---------- Header ----------
 #text(size: cfg.name-size, b.name)
@@ -60,7 +71,7 @@
 
 // ---------- Summary ----------
 #section("Summary")
-#b.summary
+#rich(b.summary)
 
 // ---------- Experience ----------
 #section("Professional Experience")
@@ -68,7 +79,7 @@
   v(cfg.job-gap, weak: true)
   [*#w.name | #w.position* | #w.location | #dates(w)]
   parbreak()
-  if "summary" in w { emph(w.summary); parbreak() }
+  if "summary" in w { emph(rich(w.summary)); parbreak() }
   if "x-groups" in w {
     for g in w.at("x-groups") {
       emph(g.title)
@@ -83,7 +94,11 @@
 
 // ---------- Projects ----------
 #section("Projects")
-#bullets(r.projects.map(p => p.name + " (" + p.keywords.join(", ") + "): " + p.description))
+#list(..r.projects.map(p => {
+  if "url" in p { link(p.url, p.name) } else { p.name }
+  " (" + p.keywords.join(", ") + "): "
+  rich(p.description)
+}))
 
 // ---------- Skills ----------
 #section("Technical Skills")

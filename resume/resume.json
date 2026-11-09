@@ -5,8 +5,12 @@
     "label": "Software Engineer",
     "email": "nevzheng@gmail.com",
     "url": "https://n8z.dev",
-    "summary": "Software engineer specializing in database and distributed data systems. ~5 years on Google BigQuery, then ~6 months at a seed-stage startup contributing to open-source Apache Iceberg and Gravitino. Looking to own hard problems end to end on a database or data infrastructure team that cares about doing things well, and to keep growing in technical leadership.",
-    "location": { "city": "Seattle", "region": "WA", "countryCode": "US" },
+    "summary": "Software engineer specializing in database and distributed data systems. ~5 years on Google BigQuery, then ~6 months at a seed-stage startup contributing to open-source [Apache Iceberg](https://iceberg.apache.org) and [Gravitino](https://gravitino.apache.org). Looking to own hard problems end to end on a database or data infrastructure team that cares about doing things well, and to keep growing in technical leadership.",
+    "location": {
+      "city": "Seattle",
+      "region": "WA",
+      "countryCode": "US"
+    },
     "profiles": [
       {
         "network": "LinkedIn",
@@ -27,7 +31,7 @@
       "location": "Remote",
       "startDate": "2026-07",
       "endDate": "2026-11",
-      "summary": "Seed-stage startup building on Apache Gravitino (open-source data catalog) and an enterprise Iceberg REST Catalog.",
+      "summary": "Seed-stage startup building on [Apache Gravitino](https://gravitino.apache.org) (open-source data catalog) and an enterprise Iceberg REST Catalog.",
       "highlights": [
         "Designed and implemented Apache Iceberg table encryption in the enterprise Iceberg REST Catalog, with keys referenced in an external KMS, key metadata served to query engines, and catalog-side metadata integrity checks.",
         "Cut a Gravitino CI integration-test suite from ~1 hour to under 10 minutes (~10x) by profiling container lifecycles and moving to a shared Testcontainers instance per run; merged into Apache Gravitino.",
@@ -51,10 +55,20 @@
         "Designed a validation strategy across query surfaces (BigQuery API, Read API) that caught several critical bugs in dependent systems, preventing potential data leaks."
       ],
       "x-groups": [
-        { "title": "Project: Streaming for BigLake", "highlights": [0, 1, 2] },
+        {
+          "title": "Project: Streaming for BigLake",
+          "highlights": [
+            0,
+            1,
+            2
+          ]
+        },
         {
           "title": "Project: Row Level & Column Level Security for BigLake",
-          "highlights": [3, 4]
+          "highlights": [
+            3,
+            4
+          ]
         }
       ]
     }
@@ -63,32 +77,61 @@
     {
       "name": "strata-db",
       "description": "SQL database engine built from scratch, covering SQL parsing, query execution, key/row encoding, schema catalog, LSM storage, WAL, and Postgres wire protocol.",
-      "keywords": ["Rust"],
+      "keywords": [
+        "Rust"
+      ],
       "url": "https://github.com/nevzheng/strata-db"
     },
     {
       "name": "mammoth-cache",
       "description": "Self-hosted build cache for Gradle, Maven, and Bazel.",
-      "keywords": ["Rust"]
+      "keywords": [
+        "Rust"
+      ],
+      "url": "https://github.com/nevzheng/mammoth-cache"
     },
     {
       "name": "mori",
       "description": "Worktree manager for running multiple coding agents in parallel.",
-      "keywords": ["Rust"]
+      "keywords": [
+        "Rust"
+      ],
+      "url": "https://github.com/nevzheng/mori"
     }
   ],
   "skills": [
     {
       "name": "Languages & Tools",
-      "keywords": ["Rust", "C++", "Java", "Python", "SQL", "Shell", "Terraform", "Pulumi", "Gradle", "Bazel"]
+      "keywords": [
+        "Rust",
+        "C++",
+        "Java",
+        "Python",
+        "SQL",
+        "Shell",
+        "Terraform",
+        "Pulumi",
+        "Gradle",
+        "Bazel"
+      ]
     },
     {
       "name": "Distributed Systems",
-      "keywords": ["Database Internals (LSM Trees, Consensus)", "Query Processing & Optimization", "Fault-Tolerant Architectures", "Data Lakes", "Streaming Data Pipelines"]
+      "keywords": [
+        "Database Internals (LSM Trees, Consensus)",
+        "Query Processing & Optimization",
+        "Fault-Tolerant Architectures",
+        "Data Lakes",
+        "Streaming Data Pipelines"
+      ]
     },
     {
       "name": "Platforms",
-      "keywords": ["Google Cloud Platform (GCP)", "BigQuery", "Google Spanner"]
+      "keywords": [
+        "Google Cloud Platform (GCP)",
+        "BigQuery",
+        "Google Spanner"
+      ]
     }
   ],
   "education": [
@@ -107,5 +150,8 @@
       "startDate": "2013",
       "endDate": "2017"
     }
-  ]
+  ],
+  "meta": {
+    "lastModified": "2026-11-09"
+  }
 }
