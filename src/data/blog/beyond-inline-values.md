@@ -73,16 +73,16 @@ We should be able to reason about performance from the design before measuring i
 
 Dimensions chosen where options differ meaningfully. Dimensions where all options score similarly (concurrency, correctness/verifiability) are not included.
 
-| Dimension | A. Inline | B. WiscKey | C. Block-Based |
-| --- | --- | --- | --- |
-| **Flexibility** 🥇 | 🔴 No extension point. Any new capability requires touching the whole encoding. | 🟡 Key/value separation helps but the value log format is rigid and unstructured. | 🟢 High extensibility. New block types can be invented as needed without touching existing blocks. |
-| **MVCC Readiness** 🥇🥈 | 🔴 Each version = full tuple copy. N versions = N full copies in tree. | 🔴 Value log has no native version structure. MVCC requires additional indexing into the log. GC and snapshot isolation conflict directly. | 🟢 Natural fit. Stable block IDs enable delta chains without data copies. |
-| **Complexity** 🥇 | 🟢 Dead simple. Already working. | 🟡 Moderate. GC complexity. Two-path I/O. | 🔴 Most complex. Upfront design decisions required. |
-| **Read Amplification** 🥉 *useful work per read I/O* | 🔴 Scans full tuple regardless of selectivity. We pay for data we don't need on every read. | 🟡 Two I/Os per read, both may return irrelevant data. No opportunity to optimize what gets read. | 🟢 More seeks but locality and prefetching mean every byte read can contribute to the query result. Partial reads possible. |
-| **Write Amplification** 🥉 *useful work per write I/O* | 🔴 Rewrites full tuple and metadata regardless of what changed. No delta support. | 🟢 Append-only write path. Only the new value is written. Read path becomes more complex but write usefulness is high. | 🟡 Delta blocks allow writing only what changed. Not yet implemented. Currently rewrites full blocks. High ceiling, not yet realized. |
-| **Compaction Amplification** 🥉 *reads and writes required to complete compaction vs live data kept* | 🔴 Must read and rewrite full tuples. Physical layout offers no shortcuts. | 🟢 Compaction touches small keys only. Values untouched. Log GC is separate cost. | 🟢 Indirection lets compaction touch only blocks that need merging or deletion. Opportunities to skip rewriting unchanged blocks entirely. |
-| **Space Amplification** 🥉 *physical storage cost per logical tuple or MVCC chain* | 🔴 Physical cost scales with tuple width × number of versions. Dead versions sit on disk until compaction. For wide rows, cost is dominated by value size. | 🟡 LSM stays lean — keys only. Value log accumulates dead values until GC runs. Physical cost depends heavily on GC frequency. | 🟢 Physical cost bounded at the block level. Dead blocks tracked and reclaimed during compaction. Indirection means logical deletes don't require immediate physical rewrites. |
-| **Caching / Locality** 🥉 *ability to cache and exploit data locality* | 🔴 No cache. Key-to-tuple is a poor basis for locality or prefetching. | 🔴 No natural unit of locality. A caching strategy would need to be designed from scratch with no good logical structure to build on. | 🟢 Buffer pool keyed by stable block ID. Natural unit for locality and prefetching. |
+| Dimension                                                                                            | A. Inline                                                                                                                                                  | B. WiscKey                                                                                                                                 | C. Block-Based                                                                                                                                                                 |
+| ---------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Flexibility** 🥇                                                                                   | 🔴 No extension point. Any new capability requires touching the whole encoding.                                                                            | 🟡 Key/value separation helps but the value log format is rigid and unstructured.                                                          | 🟢 High extensibility. New block types can be invented as needed without touching existing blocks.                                                                             |
+| **MVCC Readiness** 🥇🥈                                                                              | 🔴 Each version = full tuple copy. N versions = N full copies in tree.                                                                                     | 🔴 Value log has no native version structure. MVCC requires additional indexing into the log. GC and snapshot isolation conflict directly. | 🟢 Natural fit. Stable block IDs enable delta chains without data copies.                                                                                                      |
+| **Complexity** 🥇                                                                                    | 🟢 Dead simple. Already working.                                                                                                                           | 🟡 Moderate. GC complexity. Two-path I/O.                                                                                                  | 🔴 Most complex. Upfront design decisions required.                                                                                                                            |
+| **Read Amplification** 🥉 _useful work per read I/O_                                                 | 🔴 Scans full tuple regardless of selectivity. We pay for data we don't need on every read.                                                                | 🟡 Two I/Os per read, both may return irrelevant data. No opportunity to optimize what gets read.                                          | 🟢 More seeks but locality and prefetching mean every byte read can contribute to the query result. Partial reads possible.                                                    |
+| **Write Amplification** 🥉 _useful work per write I/O_                                               | 🔴 Rewrites full tuple and metadata regardless of what changed. No delta support.                                                                          | 🟢 Append-only write path. Only the new value is written. Read path becomes more complex but write usefulness is high.                     | 🟡 Delta blocks allow writing only what changed. Not yet implemented. Currently rewrites full blocks. High ceiling, not yet realized.                                          |
+| **Compaction Amplification** 🥉 _reads and writes required to complete compaction vs live data kept_ | 🔴 Must read and rewrite full tuples. Physical layout offers no shortcuts.                                                                                 | 🟢 Compaction touches small keys only. Values untouched. Log GC is separate cost.                                                          | 🟢 Indirection lets compaction touch only blocks that need merging or deletion. Opportunities to skip rewriting unchanged blocks entirely.                                     |
+| **Space Amplification** 🥉 _physical storage cost per logical tuple or MVCC chain_                   | 🔴 Physical cost scales with tuple width × number of versions. Dead versions sit on disk until compaction. For wide rows, cost is dominated by value size. | 🟡 LSM stays lean — keys only. Value log accumulates dead values until GC runs. Physical cost depends heavily on GC frequency.             | 🟢 Physical cost bounded at the block level. Dead blocks tracked and reclaimed during compaction. Indirection means logical deletes don't require immediate physical rewrites. |
+| **Caching / Locality** 🥉 _ability to cache and exploit data locality_                               | 🔴 No cache. Key-to-tuple is a poor basis for locality or prefetching.                                                                                     | 🔴 No natural unit of locality. A caching strategy would need to be designed from scratch with no good logical structure to build on.      | 🟢 Buffer pool keyed by stable block ID. Natural unit for locality and prefetching.                                                                                            |
 
 ## 5. Decision
 
@@ -115,7 +115,7 @@ Row data is stored inline alongside keys in SSTable entries. The tuple is encode
 
 ### B. WiscKey — Value Log
 
-*Lu et al., FAST '16*
+_Lu et al., FAST '16_
 
 Keys stay in the LSM. Values are written to a separate append-only value log. The SSTable entry stores a pointer (log offset) instead of the value itself. LSM compaction only touches keys — values are never moved. Value log GC is a separate process responsible for reclaiming dead values and consolidating versions.
 
@@ -133,7 +133,7 @@ Log:      [ tuple ]            [ tuple ]            [ tuple ]            ...
 
 ### C. Block-Based Storage — SSTable Format
 
-*LevelDB Table Format; RocksDB Block Cache; Pebble*
+_LevelDB Table Format; RocksDB Block Cache; Pebble_
 
 Values are stored in fixed-size typed blocks on disk. The SSTable index stores a block ID and offset instead of an inline value. An in-memory buffer pool sits in front of disk I/O, keyed by stable block ID.
 
@@ -178,12 +178,12 @@ Performance claims in this document are reasoned from design principles. Benchma
 
 ## References
 
-1. O'Neil et al. — *The Log-Structured Merge-Tree (LSM-Tree)*, 1996
-2. Lu et al. — *WiscKey: Separating Keys from Values in SSD-Conscious Storage*, FAST '16
+1. O'Neil et al. — _The Log-Structured Merge-Tree (LSM-Tree)_, 1996
+2. Lu et al. — _WiscKey: Separating Keys from Values in SSD-Conscious Storage_, FAST '16
 3. Google — [LevelDB Table Format](https://github.com/google/leveldb/blob/main/doc/table_format.md)
 4. Meta — [RocksDB Block Cache Documentation](https://github.com/facebook/rocksdb/wiki/Block-Cache)
 5. CockroachDB — [Pebble](https://github.com/cockroachdb/pebble)
-6. Matei et al. — *CockroachDB: The Resilient Geo-Distributed SQL Database*, SIGMOD '20
+6. Matei et al. — _CockroachDB: The Resilient Geo-Distributed SQL Database_, SIGMOD '20
 7. [ADR Format Reference](https://adr.github.io)
 
 ---
