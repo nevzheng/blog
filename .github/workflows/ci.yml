@@ -46,6 +46,14 @@ jobs:
       - name: "📝 Checking code format"
         run: pnpm run format:check
 
+      - name: "🔤 Cache fonts"
+        uses: actions/cache@v4
+        with:
+          path: |
+            resume/fonts/*.ttf
+            public/fonts
+          key: fonts-${{ hashFiles('scripts/fetch-fonts.mjs') }}
+
       - name: "🚀 Build the project"
         run: pnpm run build
 
@@ -61,6 +69,17 @@ jobs:
         uses: typst-community/setup-typst@v4
         with:
           typst-version: "0.13.1"
+
+      - name: "🔤 Cache fonts"
+        uses: actions/cache@v4
+        with:
+          path: |
+            resume/fonts/*.ttf
+            public/fonts
+          key: fonts-${{ hashFiles('scripts/fetch-fonts.mjs') }}
+
+      - name: "🔤 Download fonts"
+        run: node scripts/fetch-fonts.mjs
 
       - name: "📄 Build resume PDF"
         run: typst compile --ignore-system-fonts --font-path resume/fonts resume/resume.typ resume.pdf

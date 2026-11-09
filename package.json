@@ -4,9 +4,10 @@
   "version": "5.5.1",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro check && astro build && pagefind --site dist && cp -r dist/pagefind public/",
+    "fonts": "node scripts/fetch-fonts.mjs",
+    "build": "node scripts/fetch-fonts.mjs && astro check && astro build && pagefind --site dist && cp -r dist/pagefind public/",
     "preview": "astro preview",
-    "resume:pdf": "typst compile --ignore-system-fonts --font-path resume/fonts resume/resume.typ public/resume.pdf",
+    "resume:pdf": "node scripts/fetch-fonts.mjs && typst compile --ignore-system-fonts --font-path resume/fonts resume/resume.typ public/resume.pdf",
     "sync": "astro sync",
     "astro": "astro",
     "format:check": "prettier --check .",
