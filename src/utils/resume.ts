@@ -17,6 +17,11 @@ type Work = (typeof data.work)[number] & {
 
 const LINK = /\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g;
 
+/** Plain text for a text field: [label](url) becomes label. */
+export function plainText(text: string): string {
+  return text.replace(LINK, "$1");
+}
+
 /** HTML for a text field, turning Markdown-style [label](url) into links. */
 export function richHtml(text: string): string {
   const esc = (t: string) =>

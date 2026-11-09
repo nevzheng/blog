@@ -48,7 +48,7 @@
 // Text fields may contain Markdown-style links: [label](https://...)
 #let rich(s) = {
   let pos = 0
-  for m in s.matches(regex("\\[([^\\]]+)\\]\\(([^)]+)\\)")) {
+  for m in s.matches(regex("\\[([^\\]]+)\\]\\((https?://[^)\\s]+)\\)")) {
     s.slice(pos, m.start)
     link(m.captures.at(1), m.captures.at(0))
     pos = m.end

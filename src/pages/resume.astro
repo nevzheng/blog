@@ -8,6 +8,7 @@ import {
   contactParts,
   dateRange,
   downloadName,
+  plainText,
   richHtml,
   workGroups,
 } from "@/utils/resume";
@@ -15,7 +16,7 @@ import {
 const b = resume.basics;
 ---
 
-<Layout title={`Resume | ${SITE.title}`} description={b.summary}>
+<Layout title={`Resume | ${SITE.title}`} description={plainText(b.summary)}>
   <Header />
   <main id="main-content" class="app-layout">
     <div class="mt-6 mb-6 flex flex-wrap gap-3 text-sm">
