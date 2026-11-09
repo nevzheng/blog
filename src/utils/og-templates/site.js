@@ -39,6 +39,9 @@ export default async () => {
             type: "div",
             props: {
               style: {
+                // Positioned so it paints above the absolute "shadow" card
+                // (satori follows CSS stacking order).
+                position: "relative",
                 border: "4px solid #000",
                 background: "#fefbfb",
                 borderRadius: "4px",
