@@ -48,3 +48,17 @@ jobs:
 
       - name: "🚀 Build the project"
         run: pnpm run build
+
+  resume:
+    name: Resume compiles
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: "☁️ Checkout repository"
+        uses: actions/checkout@v5
+
+      - name: "📄 Build resume PDF"
+        uses: xu-cheng/latex-action@v3
+        with:
+          root_file: resume.tex
+          working_directory: resume

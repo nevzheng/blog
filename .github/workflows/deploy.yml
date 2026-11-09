@@ -20,6 +20,13 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v5
+      - name: Build resume PDF
+        uses: xu-cheng/latex-action@v3
+        with:
+          root_file: resume.tex
+          working_directory: resume
+      - name: Publish resume PDF
+        run: cp resume/resume.pdf public/resume.pdf
       - name: Setup Node
         uses: actions/setup-node@v5
         with:
