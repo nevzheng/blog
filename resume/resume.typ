@@ -119,3 +119,6 @@
   parbreak()
   if "x-note" in e { emph(e.at("x-note")); parbreak() }
 })
+
+// Page count, for CI: typst query ... "<page-count>" --field value --one
+#context [#metadata(counter(page).final().first()) <page-count>]

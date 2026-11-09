@@ -64,3 +64,9 @@ jobs:
 
       - name: "📄 Build resume PDF"
         run: typst compile --ignore-system-fonts --font-path resume/fonts resume/resume.typ resume.pdf
+
+      - name: "📏 Resume stays within 2 pages"
+        run: |
+          pages=$(typst query --ignore-system-fonts --font-path resume/fonts resume/resume.typ "<page-count>" --field value --one)
+          echo "Resume PDF has $pages page(s)"
+          if [ "$pages" -gt 2 ]; then echo "::error::Resume PDF is $pages pages (limit 2)"; exit 1; fi
