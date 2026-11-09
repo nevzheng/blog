@@ -135,11 +135,12 @@ const b = resume.basics;
 <style>
   /* Mirrors the PDF / Google Docs layout. */
   .resume {
-    font-family: "Roboto", system-ui, sans-serif;
+    font-family: var(--font-ibm-plex-sans);
     font-size: 0.95rem;
     line-height: 1.45;
   }
   .name {
+    font-weight: 600;
     font-size: 2rem;
     line-height: 1.2;
   }
@@ -147,7 +148,7 @@ const b = resume.basics;
     margin-top: 0.25rem;
     font-size: 0.85rem;
   }
-  .resume a {
+  .resume :global(a) {
     text-decoration: underline;
   }
   section {
@@ -156,6 +157,7 @@ const b = resume.basics;
     padding-top: 0.75rem;
   }
   h2 {
+    font-weight: 600;
     font-size: 1.15rem;
     margin-bottom: 0.35rem;
   }

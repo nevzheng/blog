@@ -4,7 +4,8 @@
 
 // ---------- Layout settings ----------
 #let cfg = (
-  font: "Roboto",           // Google's sans-serif
+  font: "IBM Plex Sans",    // body and headings
+  heading-font: "IBM Plex Sans SmBld", // name + section headings (SemiBold); use cfg.font for Regular
   body-size: 11pt,
   name-size: 23pt,
   heading-size: 13pt,
@@ -41,7 +42,7 @@
   v(cfg.section-gap, weak: true)
   line(length: 100%, stroke: 0.5pt + cfg.rule-color)
   v(0.5em)
-  text(size: cfg.heading-size, title)
+  text(size: cfg.heading-size, font: cfg.heading-font, title)
   v(0.15em)
 }
 
@@ -59,7 +60,7 @@
 #let bullets(items) = list(..items.map(i => rich(i)))
 
 // ---------- Header ----------
-#text(size: cfg.name-size, b.name)
+#text(size: cfg.name-size, font: cfg.heading-font, b.name)
 #v(-0.3em)
 #{
   let parts = (b.location.city + ", " + b.location.region,)
