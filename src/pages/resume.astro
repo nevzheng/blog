@@ -20,25 +20,23 @@ const b = resume.basics;
   <Header />
   <main id="main-content" class="resume-main">
     <div class="downloads flex flex-wrap justify-end gap-3 text-sm">
-      <a class="download" href="/resume.pdf" download={downloadName("pdf")}
-        >Download PDF</a
-      >
-      <a class="download" href="/resume.md" download={downloadName("md")}
-        >Download Markdown</a
-      >
+      <a class="download" href="/resume.pdf" download={downloadName("pdf")}>
+        Download PDF
+      </a>
+      <a class="download" href="/resume.md" download={downloadName("md")}>
+        Download Markdown
+      </a>
     </div>
 
     <article class="resume mb-28">
       <h1 class="name">{b.name}</h1>
       <p class="contact">
-        {
-          contactParts().map((c, i) => (
-            <>
-              {i > 0 && " | "}
-              {c.href ? <a href={c.href}>{c.text}</a> : c.text}
-            </>
-          ))
-        }
+        {contactParts().map((c, i) => (
+          <>
+            {i > 0 && " | "}
+            {c.href ? <a href={c.href}>{c.text}</a> : c.text}
+          </>
+        ))}
       </p>
 
       <section>
@@ -48,95 +46,87 @@ const b = resume.basics;
 
       <section>
         <h2>Experience</h2>
-        {
-          resume.work.map(w => (
-            <div class="job">
-              <p class="role">
-                <span>
-                  <strong>
-                    {w.name} · {w.position}
-                  </strong>
-                  {w.location && <span class="muted"> · {w.location}</span>}
-                </span>
-                <span class="when">{dateRange(w)}</span>
+        {resume.work.map(w => (
+          <div class="job">
+            <p class="role">
+              <span>
+                <strong>
+                  {w.name} · {w.position}
+                </strong>
+                {w.location && <span class="muted"> · {w.location}</span>}
+              </span>
+              <span class="when">{dateRange(w)}</span>
+            </p>
+            {"summary" in w && w.summary && (
+              <p>
+                <em set:html={richHtml(w.summary)} />
               </p>
-              {"summary" in w && w.summary && (
-                <p>
-                  <em set:html={richHtml(w.summary)} />
-                </p>
-              )}
-              {workGroups(w).map(g => (
-                <>
-                  {g.title && (
-                    <p>
-                      <em>{g.title}</em>
-                    </p>
-                  )}
-                  <ul>
-                    {g.items.map(item => (
-                      <li set:html={richHtml(item)} />
-                    ))}
-                  </ul>
-                </>
-              ))}
-            </div>
-          ))
-        }
+            )}
+            {workGroups(w).map(g => (
+              <>
+                {g.title && (
+                  <p>
+                    <em>{g.title}</em>
+                  </p>
+                )}
+                <ul>
+                  {g.items.map(item => (
+                    <li set:html={richHtml(item)} />
+                  ))}
+                </ul>
+              </>
+            ))}
+          </div>
+        ))}
       </section>
 
       <section>
         <h2>Projects</h2>
         <ul>
-          {
-            resume.projects.map(p => (
-              <li>
-                {p.url ? <a href={p.url}>{p.name}</a> : p.name}
-                {` (${p.keywords.join(", ")}): `}
-                <Fragment set:html={richHtml(p.description)} />
-              </li>
-            ))
-          }
+          {resume.projects.map(p => (
+            <li>
+              {p.url ? <a href={p.url}>{p.name}</a> : p.name}
+              {` (${p.keywords.join(", ")}): `}
+              <Fragment set:html={richHtml(p.description)} />
+            </li>
+          ))}
         </ul>
       </section>
 
       <section>
         <h2>Skills</h2>
         <ul>
-          {
-            resume.skills.map(s => (
-              <li>
-                {s.name}: {s.keywords.join(", ")}
-              </li>
-            ))
-          }
+          {resume.skills.map(s => (
+            <li>
+              {s.name}: {s.keywords.join(", ")}
+            </li>
+          ))}
         </ul>
       </section>
 
       <section>
         <h2>Education</h2>
-        {
-          resume.education.map(e => (
-            <>
-              <p class="role edu">
-                <span>
-                  <strong>{e.institution}</strong>
-                  <span class="muted">
-                    {" "}
-                    · {e.studyType}, {e.area}
-                  </span>
+        {resume.education.map(e => (
+          <>
+            <p class="role edu">
+              <span>
+                <strong>{e.institution}</strong>
+                <span class="muted">
+                  {" "}
+                  · {e.studyType}, {e.area}
                 </span>
-                <span class="when">
-                  {e.startDate} – {e.endDate}
-                </span>
+              </span>
+              <span class="when">
+                {e.startDate} – {e.endDate}
+              </span>
+            </p>
+            {"x-note" in e && e["x-note"] && (
+              <p>
+                <em>{e["x-note"]}</em>
               </p>
-              {"x-note" in e && e["x-note"] && (
-                <p>
-                  <em>{e["x-note"]}</em>
-                </p>
-              )}
-            </>
-          ))
-        }
+            )}
+          </>
+        ))}
       </section>
     </article>
   </main>
