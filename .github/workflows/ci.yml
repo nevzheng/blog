@@ -50,15 +50,17 @@ jobs:
         run: pnpm run build
 
   resume:
-    name: Resume compiles
+    name: Resume builds
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       - name: "☁️ Checkout repository"
         uses: actions/checkout@v5
 
-      - name: "📄 Build resume PDF"
-        uses: xu-cheng/latex-action@v3
+      - name: "📄 Setup Typst"
+        uses: typst-community/setup-typst@v4
         with:
-          root_file: resume.tex
-          working_directory: resume
+          typst-version: "0.13.1"
+
+      - name: "📄 Build resume PDF"
+        run: typst compile --ignore-system-fonts --font-path resume/fonts resume/resume.typ resume.pdf

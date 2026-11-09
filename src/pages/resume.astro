@@ -1,0 +1,171 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import { SITE } from "@/config";
+import { resume, contactParts, dateRange, workGroups } from "@/utils/resume";
+
+const b = resume.basics;
+---
+
+<Layout title={`Resume | ${SITE.title}`} description={b.summary}>
+  <Header />
+  <main id="main-content" class="app-layout">
+    <div class="mt-6 mb-6 flex flex-wrap gap-3 text-sm">
+      <a class="download" href="/resume.pdf" download>Download PDF</a>
+      <a class="download" href="/resume.md" download>Download Markdown</a>
+    </div>
+
+    <article class="resume mb-28">
+      <h1 class="name">{b.name}</h1>
+      <p class="contact">
+        {
+          contactParts().map((c, i) => (
+            <>
+              {i > 0 && " | "}
+              {c.href ? <a href={c.href}>{c.text}</a> : c.text}
+            </>
+          ))
+        }
+      </p>
+
+      <section>
+        <h2>Summary</h2>
+        <p>{b.summary}</p>
+      </section>
+
+      <section>
+        <h2>Professional Experience</h2>
+        {
+          resume.work.map(w => (
+            <div class="job">
+              <p>
+                <strong>
+                  {w.name} | {w.position}
+                </strong>{" "}
+                | {w.location} | {dateRange(w)}
+              </p>
+              {"summary" in w && w.summary && (
+                <p>
+                  <em>{w.summary}</em>
+                </p>
+              )}
+              {workGroups(w).map(g => (
+                <>
+                  {g.title && (
+                    <p>
+                      <em>{g.title}</em>
+                    </p>
+                  )}
+                  <ul>
+                    {g.items.map(item => (
+                      <li>{item}</li>
+                    ))}
+                  </ul>
+                </>
+              ))}
+            </div>
+          ))
+        }
+      </section>
+
+      <section>
+        <h2>Projects</h2>
+        <ul>
+          {
+            resume.projects.map(p => (
+              <li>
+                {p.url ? <a href={p.url}>{p.name}</a> : p.name}
+                {` (${p.keywords.join(", ")}): ${p.description}`}
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+
+      <section>
+        <h2>Technical Skills</h2>
+        <ul>
+          {
+            resume.skills.map(s => (
+              <li>
+                {s.name}: {s.keywords.join(", ")}
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+
+      <section>
+        <h2>Education</h2>
+        {
+          resume.education.map(e => (
+            <>
+              <p>
+                {e.institution} | {e.studyType}, {e.area} | {e.startDate} –{" "}
+                {e.endDate}
+              </p>
+              {"x-note" in e && e["x-note"] && (
+                <p>
+                  <em>{e["x-note"]}</em>
+                </p>
+              )}
+            </>
+          ))
+        }
+      </section>
+    </article>
+  </main>
+  <Footer />
+</Layout>
+
+<style>
+  /* Mirrors the PDF / Google Docs layout. */
+  .resume {
+    font-family: "Roboto", system-ui, sans-serif;
+    font-size: 0.95rem;
+    line-height: 1.45;
+  }
+  .name {
+    font-size: 2rem;
+    line-height: 1.2;
+  }
+  .contact {
+    margin-top: 0.25rem;
+    font-size: 0.85rem;
+  }
+  .resume a {
+    text-decoration: underline;
+  }
+  section {
+    margin-top: 1.25rem;
+    border-top: 1px solid color-mix(in srgb, currentColor 35%, transparent);
+    padding-top: 0.75rem;
+  }
+  h2 {
+    font-size: 1.15rem;
+    margin-bottom: 0.35rem;
+  }
+  p {
+    margin: 0.3rem 0;
+  }
+  .job {
+    margin-top: 0.85rem;
+  }
+  ul {
+    list-style: disc;
+    padding-left: 2.25rem;
+    margin: 0.3rem 0 0.5rem;
+  }
+  li {
+    margin: 0.3rem 0;
+  }
+  .download {
+    border: 1px solid currentColor;
+    border-radius: 0.375rem;
+    padding: 0.35rem 0.85rem;
+  }
+  .download:hover {
+    color: var(--accent);
+  }
+</style>

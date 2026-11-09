@@ -26,11 +26,5 @@ pnpm-debug.log*
 # pagefind
 
 public/pagefind
-# resume build output (built in CI, published to /resume.pdf)
+# resume PDF (built from resume/resume.json in CI, served at /resume.pdf)
 public/resume.pdf
-resume/*.pdf
-resume/*.aux
-resume/*.log
-resume/*.out
-resume/*.fls
-resume/*.fdb_latexmk
