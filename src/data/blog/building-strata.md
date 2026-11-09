@@ -98,7 +98,7 @@ If you're interested in storage engines, these are worth looking at:
 
 ## References
 
-- Patrick O'Neil, Edward Cheng, Dieter Gawlick, Elizabeth O'Neil. *The Log-Structured Merge-Tree (LSM-Tree)*. Acta Informatica, 1996.
-- Niv Dayan and Stratos Idreos. *Dostoevsky: Better Space-Time Trade-Offs for LSM-Tree Based Key-Value Stores via Adaptive Removal of Superfluous Merging*. SIGMOD, 2018.
-- Lanyue Lu, Thanumalayan S. Pillai, Andrea C. Arpaci-Dusseau, Remzi H. Arpaci-Dusseau. *WiscKey: Separating Keys from Values in SSD-Conscious Storage*. FAST, 2016.
-- Chi Zhang, Skyzh. *mini-lsm: A tutorial to build an LSM-Tree storage engine in Rust*. [github.com/skyzh/mini-lsm](https://github.com/skyzh/mini-lsm)
+- Patrick O'Neil, Edward Cheng, Dieter Gawlick, Elizabeth O'Neil. _The Log-Structured Merge-Tree (LSM-Tree)_. Acta Informatica, 1996.
+- Niv Dayan and Stratos Idreos. _Dostoevsky: Better Space-Time Trade-Offs for LSM-Tree Based Key-Value Stores via Adaptive Removal of Superfluous Merging_. SIGMOD, 2018.
+- Lanyue Lu, Thanumalayan S. Pillai, Andrea C. Arpaci-Dusseau, Remzi H. Arpaci-Dusseau. _WiscKey: Separating Keys from Values in SSD-Conscious Storage_. FAST, 2016.
+- Chi Zhang, Skyzh. _mini-lsm: A tutorial to build an LSM-Tree storage engine in Rust_. [github.com/skyzh/mini-lsm](https://github.com/skyzh/mini-lsm)

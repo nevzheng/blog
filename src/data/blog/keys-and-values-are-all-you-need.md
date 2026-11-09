@@ -46,9 +46,9 @@ pub trait StorageEngine {
 
 Before we can store anything, we need to define what we're storing. In Strata, the catalog is organized around three concepts borrowed from BigQuery:
 
-* Project — the top-level namespace, like an organization or account
-* Dataset — a logical grouping of tables within a project
-* Table — a named collection of rows with a schema
+- Project — the top-level namespace, like an organization or account
+- Dataset — a logical grouping of tables within a project
+- Table — a named collection of rows with a schema
 
 Each level has a corresponding metadata type:
 
@@ -143,7 +143,7 @@ Encode the full namespace into the key itself, and the flat KV store gets struct
 
 Every row in the database gets a key that encodes exactly where it lives. Two rows in different tables can never collide because their keys differ at the table_id segment. And because the KV store sorts keys lexicographically, all rows in the same table are physically adjacent — listing them is just a prefix scan. Appending a version gives us a basis for MVCC for free. Multiple versions of the same row sort together naturally, laying the groundwork for point-in-time reads and snapshot isolation down the line.
 
-That's the entire trick. And it's not a new one. CockroachDB maps every SQL row into a composite key of the form {table_id}_{primary_key}_{row_id} and relies on prefix scans to retrieve all rows in a table — the same idea, just at a larger scale. Google's Spanner started life as a KV store and grew into a full relational database by layering SQL on top. TiDB takes the same approach, splitting into TiKV (the storage layer) and TiDB (the SQL engine) as separate components. The composite key scheme is how all of them do it.
+That's the entire trick. And it's not a new one. CockroachDB maps every SQL row into a composite key of the form {table*id}*{primary*key}*{row_id} and relies on prefix scans to retrieve all rows in a table — the same idea, just at a larger scale. Google's Spanner started life as a KV store and grew into a full relational database by layering SQL on top. TiDB takes the same approach, splitting into TiKV (the storage layer) and TiDB (the SQL engine) as separate components. The composite key scheme is how all of them do it.
 
 ## System Tables & Reserved UUIDs
 
@@ -285,20 +285,20 @@ Two things fall out of this layout.
 
 This is a start, not a finish. The shortlist:
 
-* **Transactions.** Catalog ops are multiple writes and not atomic today. The LSM's WAL gives durability at the storage layer; a higher-level transaction log is the next thing on top.
-* **Richer encoding and types.** Row values are JSON blobs and the schema model is minimal. A binary or columnar encoding and a real type system are both on the list.
-* **Correctness gaps.** Dropping a project orphans its datasets and tables in the engine. A future pass will walk the hierarchy and clean up transactionally.
-* **A SQL surface.** A parser and planner that turns `SELECT * FROM acme.metrics.events WHERE event = "click"` into a prefix scan on the right composite key. This is the whole reason for the catalog.
-* **Alternative encodings.** Row vs column vs PAX is a key-encoding choice on the same KV engine. A column store is `{table}{column}{row_id} → cell_value`; PAX-style hybrids fall out of grouping rows into pages first. Worth exploring once the row store is solid.
-* **Tighter prefix encoding.** The 48-byte UUID prefix is currently amortized by block-level prefix compression in the SSTable layer — runs of the same prefix collapse to near-zero on disk — but a tighter scheme could shave more. Not on the critical path.
+- **Transactions.** Catalog ops are multiple writes and not atomic today. The LSM's WAL gives durability at the storage layer; a higher-level transaction log is the next thing on top.
+- **Richer encoding and types.** Row values are JSON blobs and the schema model is minimal. A binary or columnar encoding and a real type system are both on the list.
+- **Correctness gaps.** Dropping a project orphans its datasets and tables in the engine. A future pass will walk the hierarchy and clean up transactionally.
+- **A SQL surface.** A parser and planner that turns `SELECT * FROM acme.metrics.events WHERE event = "click"` into a prefix scan on the right composite key. This is the whole reason for the catalog.
+- **Alternative encodings.** Row vs column vs PAX is a key-encoding choice on the same KV engine. A column store is `{table}{column}{row_id} → cell_value`; PAX-style hybrids fall out of grouping rows into pages first. Worth exploring once the row store is solid.
+- **Tighter prefix encoding.** The 48-byte UUID prefix is currently amortized by block-level prefix compression in the SSTable layer — runs of the same prefix collapse to near-zero on disk — but a tighter scheme could shave more. Not on the critical path.
 
 ## Further Reading
 
 More on the composite-key approach and KV-as-foundation idea:
 
-* [CockroachDB key encoding](https://github.com/cockroachdb/cockroach/blob/master/docs/tech-notes/encoding.md) — the production version of the composite-key scheme at scale.
-* [Phil Eaton on key-value databases](https://notes.eatonphil.com/whats-the-big-deal-about-key-value-databases.html) — a broader overview of why so many systems are KV stores underneath.
-* [TiKV](https://github.com/tikv/tikv) — the storage layer TiDB layers SQL on top of.
+- [CockroachDB key encoding](https://github.com/cockroachdb/cockroach/blob/master/docs/tech-notes/encoding.md) — the production version of the composite-key scheme at scale.
+- [Phil Eaton on key-value databases](https://notes.eatonphil.com/whats-the-big-deal-about-key-value-databases.html) — a broader overview of why so many systems are KV stores underneath.
+- [TiKV](https://github.com/tikv/tikv) — the storage layer TiDB layers SQL on top of.
 
 If you're curious, the code is at [github.com/nevzheng/strata-db](https://github.com/nevzheng/strata-db).
 
