@@ -28,3 +28,4 @@ pnpm-debug.log*
 public/pagefind
 # resume PDF (built from resume/resume.json in CI, served at /resume.pdf)
 public/resume.pdf
+resume/*.pdf
