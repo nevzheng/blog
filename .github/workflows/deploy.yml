@@ -19,24 +19,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
       - name: Setup Typst
-        uses: typst-community/setup-typst@v4
+        uses: typst-community/setup-typst@v5
         with:
           typst-version: "0.13.1"
       - name: Cache fonts
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             resume/fonts/*.ttf
             public/fonts
           key: fonts-${{ hashFiles('scripts/fetch-fonts.mjs') }}
       - name: Install pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v6
       - name: Build resume PDF
         run: pnpm run resume:pdf
       - name: Setup Node
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: pnpm
@@ -45,7 +45,7 @@ jobs:
       - name: Build
         run: pnpm run build
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: ./dist
 
@@ -58,4 +58,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
