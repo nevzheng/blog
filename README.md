@@ -74,3 +74,13 @@ Based on [AstroPaper v5](https://github.com/satnaing/astro-paper). See their [do
 
 - Blog content: [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)
 - Site code: MIT
+
+## Résumé
+
+`resume/resume.json` ([JSON Resume](https://jsonresume.org/) schema) is the single source of truth:
+
+- **PDF:** `resume/resume.typ` (Typst) renders it to `/resume.pdf`. Layout settings live at the top of that file. Build locally with `npm run resume:pdf` (needs [Typst](https://typst.app/)).
+- **Web page:** `src/pages/resume.astro` renders `/resume/`, with PDF and Markdown downloads.
+- **Markdown:** `src/pages/resume.md.ts` serves `/resume.md`.
+
+CI builds the PDF on every deploy; it isn't committed.
