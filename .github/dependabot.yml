@@ -1,11 +1,10 @@
-# Dependabot: weekly, grouped update PRs. CI must pass before merging.
+# Dependabot: monthly, grouped update PRs. CI must pass before merging.
 version: 2
 updates:
   - package-ecosystem: npm # also handles pnpm-lock.yaml
     directory: /
     schedule:
-      interval: weekly
-      day: monday
+      interval: monthly
       time: "09:00"
       timezone: America/Los_Angeles
     # Wait a few days after a release before proposing it (supply-chain safety).
@@ -36,8 +35,7 @@ updates:
   - package-ecosystem: github-actions
     directory: /
     schedule:
-      interval: weekly
-      day: monday
+      interval: monthly
       time: "09:00"
       timezone: America/Los_Angeles
     groups:
