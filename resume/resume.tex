@@ -1,187 +1,112 @@
 %-------------------------
-% Resume in LaTeX
-% Based on Jake Gutierrez's resume template (MIT License)
-% https://github.com/jakegut/resume
+% Nevin Zheng - résumé
+% Layout mirrors the Google Docs version: sans-serif, a rule above each
+% section, bold "Company | Title" lines, italic sublines.
+% Started from Jake Gutierrez's template (MIT): https://github.com/jakegut/resume
+% Build: pdflatex resume.tex
 %-------------------------
 
 \documentclass[letterpaper,11pt]{article}
 
-\usepackage{latexsym}
-\usepackage[empty]{fullpage}
-\usepackage{titlesec}
-\usepackage{marvosym}
-\usepackage[usenames,dvipsnames]{color}
-\usepackage{verbatim}
-\usepackage{enumitem}
-\usepackage[hidelinks]{hyperref}
-\usepackage{fancyhdr}
-\usepackage[english]{babel}
+\usepackage[margin=0.5in]{geometry}
 \usepackage[T1]{fontenc}
-\usepackage{lmodern}
-\usepackage{tabularx}
+\usepackage[sfdefault]{roboto}   % Google's sans-serif, a nod to Google Sans
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage[hidelinks]{hyperref}
+\usepackage{xcolor}
 \input{glyphtounicode}
+\pdfgentounicode=1               % machine-readable text for ATS
 
 % Show phone number? Off for the public web copy.
 \newif\ifshowphone
 \showphonefalse
 
-\pagestyle{fancy}
-\fancyhf{}
-\fancyfoot{}
-\renewcommand{\headrulewidth}{0pt}
-\renewcommand{\footrulewidth}{0pt}
-
-% Adjust margins
-\addtolength{\oddsidemargin}{-0.5in}
-\addtolength{\evensidemargin}{-0.5in}
-\addtolength{\textwidth}{1in}
-\addtolength{\topmargin}{-.5in}
-\addtolength{\textheight}{1.0in}
-
-\urlstyle{same}
-
-\raggedbottom
+\pagestyle{empty}
 \raggedright
-\setlength{\tabcolsep}{0in}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt}
+\urlstyle{same}
+\definecolor{rule}{gray}{0.6}
+\definecolor{link}{HTML}{1155CC}
 
-% Section formatting
-\titleformat{\section}{
-  \vspace{-4pt}\scshape\raggedright\large
-}{}{0em}{}[\color{black}\titlerule \vspace{-5pt}]
+% Section: thin rule, then a plain 13pt heading
+\titleformat{\section}
+  {\vspace{2pt}{\color{rule}\titlerule[0.5pt]}\vspace{8pt}\fontsize{13}{15}\selectfont}
+  {}{0em}{}
+\titlespacing*{\section}{0pt}{8pt}{3pt}
 
-% Ensure that generated PDF is machine readable/ATS parsable
-\pdfgentounicode=1
+% Bullets: indented, 2pt after each
+\setlist[itemize]{leftmargin=0.45in, labelsep=0.15in, itemsep=2pt, parsep=0pt, topsep=3pt, label=\textbullet}
 
-%-------------------------
-% Custom commands
-\newcommand{\resumeItem}[1]{
-  \item\small{
-    {#1 \vspace{-2pt}}
-  }
-}
-
-\newcommand{\resumeSubheading}[4]{
-  \vspace{-2pt}\item
-    \begin{tabular*}{0.97\textwidth}[t]{l@{\extracolsep{\fill}}r}
-      \textbf{#1} & #2 \\
-      \textit{\small#3} & \textit{\small #4} \\
-    \end{tabular*}\vspace{-7pt}
-}
-
-\newcommand{\resumeSubSubheading}[2]{
-    \item
-    \begin{tabular*}{0.97\textwidth}{l@{\extracolsep{\fill}}r}
-      \textit{\small#1} & \textit{\small #2} \\
-    \end{tabular*}\vspace{-7pt}
-}
-
-\newcommand{\resumeProjectHeading}[2]{
-    \item
-    \begin{tabular*}{0.97\textwidth}{l@{\extracolsep{\fill}}r}
-      \small#1 & #2 \\
-    \end{tabular*}\vspace{-7pt}
-}
-
-\newcommand{\resumeSubItem}[1]{\resumeItem{#1}\vspace{-4pt}}
-
-\renewcommand\labelitemii{$\vcenter{\hbox{\tiny$\bullet$}}$}
-
-\newcommand{\resumeSubHeadingListStart}{\begin{itemize}[leftmargin=0.15in, label={}]}
-\newcommand{\resumeSubHeadingListEnd}{\end{itemize}}
-\newcommand{\resumeItemListStart}{\begin{itemize}}
-\newcommand{\resumeItemListEnd}{\end{itemize}\vspace{-5pt}}
-
-%-------------------------------------------
-%%%%%%  RESUME STARTS HERE  %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\job}[4]{% company, title, location, dates
+  \vspace{4pt}\textbf{#1 | #2} | #3 | #4\par\vspace{3pt}}
+\newcommand{\subline}[1]{\textit{#1}\par}
+\newcommand{\weblink}[2]{\href{#1}{\color{link}\underline{#2}}}
 
 \begin{document}
 
 %----------HEADING----------
-\begin{center}
-    \textbf{\Huge \scshape Nevin Zheng} \\ \vspace{1pt}
-    \small Seattle, WA $|$
-    \ifshowphone +1 781-664-7521 $|$ \fi
-    \href{mailto:nevzheng@gmail.com}{\underline{nevzheng@gmail.com}} $|$
-    \href{https://linkedin.com/in/nevinzheng}{\underline{linkedin.com/in/nevinzheng}} $|$
-    \href{https://github.com/nevzheng}{\underline{github.com/nevzheng}} $|$
-    \href{https://n8z.dev}{\underline{n8z.dev}}
-\end{center}
+{\fontsize{24}{28}\selectfont Nevin Zheng}\par\vspace{4pt}
+{\small Seattle, WA |
+ \ifshowphone +1 781-664-7521 | \fi
+ nevzheng@gmail.com |
+ \weblink{https://linkedin.com/in/nevinzheng}{linkedin.com/in/nevinzheng} |
+ \weblink{https://github.com/nevzheng}{github.com/nevzheng}}\par
 
 %-----------SUMMARY-----------
 \section{Summary}
-\small{Software engineer specializing in database and distributed data systems. \textasciitilde5 years on Google BigQuery, then \textasciitilde6 months at a seed-stage startup contributing to open-source Apache Iceberg and Gravitino. Looking to own hard problems end to end on a database or data infrastructure team that cares about doing things well, and to keep growing in technical leadership.}
+Software engineer specializing in database and distributed data systems. \textasciitilde5 years on Google BigQuery, then \textasciitilde6 months at a seed-stage startup contributing to open-source Apache Iceberg and Gravitino. Looking to own hard problems end to end on a database or data infrastructure team that cares about doing things well, and to keep growing in technical leadership.\par
 
 %-----------EXPERIENCE-----------
-\section{Experience}
-  \resumeSubHeadingListStart
+\section{Professional Experience}
 
-    \resumeSubheading
-      {Datastrato}{Jul 2026 -- Nov 2026}
-      {Software Engineer}{Remote}
-      \resumeItemListStart
-        \item[]\hspace{-0.18in}\small\textit{Seed-stage startup building on Apache Gravitino (open-source data catalog) and an enterprise Iceberg REST Catalog.}
-        \resumeItem{Designed and implemented Apache Iceberg table encryption in the enterprise Iceberg REST Catalog, with keys referenced in an external KMS, key metadata served to query engines, and catalog-side metadata integrity checks.}
-        \resumeItem{Cut a Gravitino CI integration-test suite from \textasciitilde1 hour to under 10 minutes (\textasciitilde10x) by profiling container lifecycles and moving to a shared Testcontainers instance per run; merged into Apache Gravitino.}
-        \resumeItem{Designed and prototyped tombstone-based soft delete and incremental / full-refresh materialized view maintenance against the draft Iceberg materialized view spec.}
-        \resumeItem{Contributed to Apache Iceberg spec discussions on REST catalog read restrictions, materialized views, and table encryption.}
-        \resumeItem{Self-initiated and prototyped Loom, a release-qualification CI/CD platform to catch regressions before release.}
-        \resumeItem{Led cloud security incident response and recommended review-gated infrastructure-as-code.}
-      \resumeItemListEnd
+\job{Datastrato}{Software Engineer}{Remote}{Jul 2026 -- Nov 2026}
+\subline{Seed-stage startup building on Apache Gravitino (open-source data catalog) and an enterprise Iceberg REST Catalog.}
+\begin{itemize}
+  \item Designed and implemented Apache Iceberg table encryption in the enterprise Iceberg REST Catalog, with keys referenced in an external KMS, key metadata served to query engines, and catalog-side metadata integrity checks.
+  \item Cut a Gravitino CI integration-test suite from \textasciitilde1 hour to under 10 minutes (\textasciitilde10x) by profiling container lifecycles and moving to a shared Testcontainers instance per run; merged into Apache Gravitino.
+  \item Designed and prototyped tombstone-based soft delete and incremental / full-refresh materialized view maintenance against the draft Iceberg materialized view spec.
+  \item Contributed to Apache Iceberg spec discussions on REST catalog read restrictions, materialized views, and table encryption.
+  \item Self-initiated and prototyped Loom, a release-qualification CI/CD platform to catch regressions before release.
+  \item Led cloud security incident response and recommended review-gated infrastructure-as-code.
+\end{itemize}
 
-    \resumeSubheading
-      {Google}{2021 -- 2026}
-      {Software Engineer, BigQuery}{Seattle, WA}
-      \resumeItemListStart
-        \item[]\hspace{-0.18in}\small\textit{Streaming for BigLake}
-        \resumeItem{Owned productionization of a novel streaming feature from local prototype to customer preview, driving the end-to-end testing strategy, release process, and SRE collaboration.}
-        \resumeItem{Drove design refinements and API negotiations across 3 core teams (BigQuery, WriteAPI, SRE) in a complex microservices architecture.}
-        \resumeItem{Implemented fixes during a critical production outage and contributed to the postmortem.}
-        \item[]\hspace{-0.18in}\small\textit{Row- and Column-Level Security for BigLake}
-        \resumeItem{Owned end-to-end integration of row- and column-level security for a new table format, reaching feature parity for an enterprise product.}
-        \resumeItem{Designed a validation strategy across query surfaces (BigQuery API, Read API) that caught several critical bugs in dependent systems, preventing potential data leaks.}
-      \resumeItemListEnd
+\job{Google}{Software Engineer, BigQuery}{Seattle, WA}{2021 -- 2026}
+\subline{Project: Streaming for BigLake}
+\begin{itemize}
+  \item Owned productionization of a novel streaming feature from local prototype to customer preview, driving the end-to-end testing strategy, release process, and SRE collaboration.
+  \item Drove design refinements and API negotiations across 3 core teams (BigQuery, WriteAPI, SRE) in a complex microservices architecture.
+  \item Implemented fixes during a critical production outage and contributed to the postmortem.
+\end{itemize}
+\subline{Project: Row Level \& Column Level Security for BigLake}
+\begin{itemize}
+  \item Owned end-to-end integration of row- and column-level security for a new table format, reaching feature parity for an enterprise product.
+  \item Designed a validation strategy across query surfaces (BigQuery API, Read API) that caught several critical bugs in dependent systems, preventing potential data leaks.
+\end{itemize}
 
-  \resumeSubHeadingListEnd
+\clearpage
 
 %-----------PROJECTS-----------
 \section{Projects}
-    \resumeSubHeadingListStart
-      \resumeProjectHeading
-          {\textbf{strata-db} $|$ \emph{Rust}}{}
-          \resumeItemListStart
-            \resumeItem{SQL database engine built from scratch, covering SQL parsing, query execution, key/row encoding, schema catalog, LSM storage, WAL, and Postgres wire protocol.}
-          \resumeItemListEnd
-      \resumeProjectHeading
-          {\textbf{mammoth-cache} $|$ \emph{Rust}}{}
-          \resumeItemListStart
-            \resumeItem{Self-hosted build cache for Gradle, Maven, and Bazel.}
-          \resumeItemListEnd
-      \resumeProjectHeading
-          {\textbf{mori} $|$ \emph{Rust}}{}
-          \resumeItemListStart
-            \resumeItem{Worktree manager for running multiple coding agents in parallel.}
-          \resumeItemListEnd
-    \resumeSubHeadingListEnd
+\begin{itemize}
+  \item strata-db (Rust): SQL database engine built from scratch, covering SQL parsing, query execution, key/row encoding, schema catalog, LSM storage, WAL, and Postgres wire protocol.
+  \item mammoth-cache (Rust): self-hosted build cache for Gradle, Maven, and Bazel.
+  \item mori (Rust): worktree manager for running multiple coding agents in parallel.
+\end{itemize}
 
 %-----------SKILLS-----------
 \section{Technical Skills}
- \begin{itemize}[leftmargin=0.15in, label={}]
-    \small{\item{
-     \textbf{Languages \& Tools}{: Rust, C++, Java, Python, SQL, Shell, Terraform, Pulumi, Gradle, Bazel} \\
-     \textbf{Distributed Systems}{: Database Internals (LSM Trees, Consensus), Query Processing \& Optimization, Fault-Tolerant Architectures, Data Lakes, Streaming Data Pipelines} \\
-     \textbf{Platforms}{: Google Cloud Platform (GCP), BigQuery, Google Spanner}
-    }}
- \end{itemize}
+\begin{itemize}
+  \item Languages \& Tools: Rust, C++, Java, Python, SQL, Shell, Terraform, Pulumi, Gradle, Bazel
+  \item Distributed Systems: Database Internals (LSM Trees, Consensus), Query Processing \& Optimization, Fault-Tolerant Architectures, Data Lakes, Streaming Data Pipelines
+  \item Platforms: Google Cloud Platform (GCP), BigQuery, Google Spanner
+\end{itemize}
 
 %-----------EDUCATION-----------
 \section{Education}
-  \resumeSubHeadingListStart
-    \resumeSubheading
-      {Carnegie Mellon University}{2019 -- 2021}
-      {Master of Science, Computer Engineering; Database Systems specialization with Prof. Andy Pavlo}{Pittsburgh, PA}
-    \resumeSubheading
-      {Boston University}{2013 -- 2017}
-      {Bachelor of Science, Computer and Electrical Engineering (Double Major)}{Boston, MA}
-  \resumeSubHeadingListEnd
+Carnegie Mellon University | Master of Science, Computer Engineering | 2019 -- 2021\par\vspace{3pt}
+\subline{Specialization in Database Systems with Professor Andy Pavlo.}\vspace{3pt}
+Boston University | Bachelor of Science, Computer and Electrical Engineering (Double Major) | 2013 -- 2017\par
 
 \end{document}
