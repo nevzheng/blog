@@ -16,7 +16,7 @@
   bullet-gap: 0.75em,       // space between bullets
   job-gap: 1.0em,           // space above each job
   section-gap: 1.0em,       // space above each section rule
-  break-before-projects: true,
+  break-before-projects: false, // true = always start Projects on page 2
 )
 // --------------------------------------
 
@@ -38,13 +38,20 @@
 }
 #let dates(e) = fmt-date(e.at("startDate", default: none)) + " – " + fmt-date(e.at("endDate", default: none))
 
-#let section(title) = {
-  v(cfg.section-gap, weak: true)
-  line(length: 100%, stroke: 0.5pt + cfg.rule-color)
-  v(0.5em)
+// A section never splits across pages: its rule, heading and content move together.
+// No rule when a section starts at the top of a page.
+#let rule() = context {
+  if here().position().y > cfg.margin + 2pt {
+    line(length: 100%, stroke: 0.5pt + cfg.rule-color)
+    v(0.5em)
+  }
+}
+#let section(title, body) = block(breakable: false, width: 100%, above: cfg.section-gap, {
+  rule()
   text(size: cfg.heading-size, font: cfg.heading-font, title)
   v(0.15em)
-}
+  body
+})
 
 // Text fields may contain Markdown-style links: [label](https://...)
 #let rich(s) = {
@@ -71,13 +78,16 @@
 }
 
 // ---------- Summary ----------
-#section("Summary")
-#rich(b.summary)
+#section("Summary", rich(b.summary))
 
 // ---------- Experience ----------
-#section("Professional Experience")
-#for w in r.work {
-  v(cfg.job-gap, weak: true)
+#block(above: cfg.section-gap, {
+  rule()
+  text(size: cfg.heading-size, font: cfg.heading-font, "Professional Experience")
+  v(0.15em)
+})
+// Each job stays on one page.
+#for w in r.work { block(breakable: false, above: cfg.job-gap, {
   [*#w.name | #w.position* | #w.location | #dates(w)]
   parbreak()
   if "summary" in w { emph(rich(w.summary)); parbreak() }
@@ -89,26 +99,23 @@
   } else {
     bullets(w.highlights)
   }
-}
+}) }
 
 #if cfg.break-before-projects { pagebreak(weak: true) }
 
 // ---------- Projects ----------
-#section("Projects")
-#list(..r.projects.map(p => {
+#section("Projects", list(..r.projects.map(p => {
   if "url" in p { link(p.url, p.name) } else { p.name }
   " (" + p.keywords.join(", ") + "): "
   rich(p.description)
-}))
+})))
 
 // ---------- Skills ----------
-#section("Technical Skills")
-#bullets(r.skills.map(s => s.name + ": " + s.keywords.join(", ")))
+#section("Technical Skills", bullets(r.skills.map(s => s.name + ": " + s.keywords.join(", "))))
 
 // ---------- Education ----------
-#section("Education")
-#for e in r.education {
+#section("Education", for e in r.education {
   [#e.institution | #e.studyType, #e.area | #e.startDate – #e.endDate]
   parbreak()
   if "x-note" in e { emph(e.at("x-note")); parbreak() }
-}
+})
