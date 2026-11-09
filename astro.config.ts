@@ -68,47 +68,6 @@ export default defineConfig({
         weights: [300, 400, 500, 600, 700],
         styles: ["normal", "italic"],
       },
-      {
-        // Résumé font (same files as the PDF, self-hosted). OFL 1.1.
-        name: "IBM Plex Sans",
-        cssVariable: "--font-ibm-plex-sans",
-        provider: fontProviders.local(),
-        fallbacks: ["sans-serif"],
-        options: {
-          variants: [
-            {
-              weight: 400,
-              style: "normal",
-              src: ["./src/assets/fonts/IBMPlexSans-Regular.woff2"],
-            },
-            {
-              weight: 400,
-              style: "italic",
-              src: ["./src/assets/fonts/IBMPlexSans-Italic.woff2"],
-            },
-            {
-              weight: 600,
-              style: "normal",
-              src: ["./src/assets/fonts/IBMPlexSans-SemiBold.woff2"],
-            },
-            {
-              weight: 600,
-              style: "italic",
-              src: ["./src/assets/fonts/IBMPlexSans-SemiBoldItalic.woff2"],
-            },
-            {
-              weight: 700,
-              style: "normal",
-              src: ["./src/assets/fonts/IBMPlexSans-Bold.woff2"],
-            },
-            {
-              weight: 700,
-              style: "italic",
-              src: ["./src/assets/fonts/IBMPlexSans-BoldItalic.woff2"],
-            },
-          ],
-        },
-      },
     ],
   },
 });
